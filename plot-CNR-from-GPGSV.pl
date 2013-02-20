@@ -9,62 +9,46 @@
 # provided "as is", don`pay me but don`t sue me...
 ##
 # call like this:
-# ./plot-CNR-from-GPGSV.pl < log-2013-02-16-23-16.nmea
+# ./plot-CNR-from-GPGSV.pl  log-2013-02-16-23-16.nmea
 
 
-# use DateTime;		# really heavy
-# use DateTime::Tiny;   # cannot resolve backwards
 use Time::Local 'timegm_nocheck' ;	# tiny but what I need
 use Data::Dumper ;
-# use Chart::Gnuplot;  ... no advantage to add any obscurity layer .. use "| gnuplot" instead
 
 # in a data base, this might be tables
 @data =();	# collection of pointers to all sv x time data
 %times =(); 	# pointer to arrays of all data for each time
 @svs =();	# count number of data for each sv
 
-# @recent=(); # memorize current sv data until we have a valid time
 
-# read from stdin
+# read input file name from cmd line 
 
 $infile = $ARGV[0] or die ("usage: $0 someinputfile.name");
 open INFILE , $infile or die ("cannot read from input file named $infile");
 
+
+# read input file
 while(<INFILE>) {
 	# print $_;
 	chomp ; chop ; #  looks like chomp removes NL but leaves CR 
-	# ($qual, $data, $chskum) =~ /(\$GP\D{3})(.*)(,\*\d{2})/ ;
 
 	# parse GSV lines
 	if( /\$GP(\w{3}),(.*)(\*..)$/  ) { 
- 		# /\$GP(GSV)(.*)(\*..)$/ ;
 	
-		### printf (">>%s<< >>%s<< >>%s<<\n", $1, $2, $3);	# $qual, $data, $chskum);
-
 		@fields = split (',' , $2);
 
 		if($1 eq 'RMC') {
 			### print ("RMC-record: ");
-			# print $fields[0]; 	# UTC hhmmss.ss
-
-			# print " - ";
-			# print $fields[8];	# Date, ddmmyy 
-			# print (" | ");
-
                         my $hh = substr($fields[0], 0, 2);
                         my $mm = substr($fields[0], 2, 2);
                         my $ss = substr($fields[0], 4, 2);
 			my $ms = ( ( "0" . substr($fields[0], 6) ) * 1000);
-			
 
                         my $dd = substr($fields[8], 0, 2);
                         my $MM = substr($fields[8], 2, 2);
                         my $yy = substr($fields[8], 4, 2) + 2000 ;
 
 			$timestamp = timegm_nocheck($ss,$mm,$hh,$dd,$MM-1,$yy);
-			# check by reverse conversion
-			### print scalar gmtime $timestamp;
-			### print "\n";
 
                         # insert timestamp into all SV collected
                         foreach $svc (@current) {
@@ -81,7 +65,6 @@ while(<INFILE>) {
 		}
 		elsif ($1 eq 'GSV') {
                         ### print ("GSV-record: ");
-
 
 			# http://www.nmea.de/nmea0183datensaetze.html#gsv 
 			#  1) total number of messages
@@ -109,15 +92,12 @@ while(<INFILE>) {
 				### printf ("sat no %i elevation %i azimuth %i SNR %i\n", $svn, $ele, $azi, $snr); 
 				push (@current, [0, $svn, $ele, $azi, $snr ] );
 			}
-
                         ### print ("\n");
-
 		}
-
 	} else {
 
 		printf "================== parse error ============ \n";
-		print $_;
+		printf  ">>>$_<<<";
 		print "\n";
 	}
 
@@ -128,7 +108,7 @@ while(<INFILE>) {
 close INFILE;
 
 #================
-# debuh print: show what we have now:
+# debug print: show what we have now:
 print "======================== read complete =======================\n";
 
 # print Dumper([@data]);
@@ -138,8 +118,7 @@ print "======================== read complete =======================\n";
 # print Dumper([@svs]);
 # print "--------------------------------------\n";
 
-# hey, we can make animated gif, so we can display multiple satellites?
-# create 
+# create data structure for each satellite 
 foreach $SV (1 .. @svs) {
 	# print "SV number ", $SV, " ";
 	if ($hits = $svs[$SV]) {
@@ -152,11 +131,8 @@ foreach $SV (1 .. @svs) {
 	$sv_snr[$SV] = [];
 }
 
-# hmmm whatever we do we need x any y in matching arrays
+# hmmm whatever we do we need all our data in matching arrays
 # we like to keep them in higher level arrays by satelite number...
-
-# @sv_time = []  x @svs ;
-
 
 # print Dumper([@sv_time]);
 
@@ -194,14 +170,10 @@ print "====== calling gnuplot =========\n";
 
 $gnuplot = "/usr/bin/gnuplot";
 
-# (my $basename = $infile) =~ s/\.[^.]+$//;
-
-# $name =~ s{.*/}{};      # removes path  
 (my $pathbase = $infile)   =~ s{\.[^.]+$}{}; # removes extension
 (my $basename = $pathbase) =~ s{.*/}{};      # removes path
 
 printf("basename: >>%s<<, pathbase >>%s<<, infile: >>%s<<\n",   $basename , $pathbase , $infile);
-# exit;
 
 $tempfile_dir = $pathbase;
 my $i = 0;
@@ -214,16 +186,7 @@ while (-d $tempfile_dir) {
 mkdir $tempfile_dir;
 
 $tempfile_prefix = sprintf("%s/%s", $tempfile_dir, $basename);
-
 printf("dir: %s ; prefix: %s\n", $tempfile_dir , $tempfile_prefix);
-#=============~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------
-
-# exit;
-
-# $tempfile_prefix="./fig/test-";
-
-# $time_suffix = `date +%F-%T`;
-# chomp $time_suffix;
 
 # $tempfile_body = $tempfile_prefix . $time_suffix;
 $tempfile_body = $tempfile_prefix;
@@ -232,28 +195,8 @@ $tempdata = $tempfile_body . '.data';
 $templog  = $tempfile_body . '.log';
 
 
-
 # SV no 12 for first trial
-print "creating chart....\n";
-#    my $chart = Chart::Gnuplot->new(
-#        output => "fig/first.gif",
-#	terminal => "gif",
-#	xrange => [0, 90 ],
-#	yrange => [0, 50 ]
-#	 );
-
-
-print "creating dataset....\n";
-# my $dataSet = Chart::Gnuplot::DataSet->new(
-#        xdata => @sv_ele[12],
-#        ydata => @sv_snr[12]
-#	);
-
-# print Data::Dumper->Dump([ (@sv_ele[12] ) ]);
-# print $#{$sv_ele[12]};
-# print "\n";
-
-# exit;
+print "writing data....\n";
 
 open (DATAFILE, ">".$tempdata) || error ("could not create temp data file $tempdata");
 
@@ -264,9 +207,7 @@ foreach $i (0..$#{$sv_ele[12]}) {
 
 close DATAFILE || error ("could not close temp data file $tempdata");
 
-print "calling plot  \n";
-# $chart->plot2d($dataSet);
-
+print "creating chart  \n";
 
 $command= <<ENDOFCOMMAND;
 set term png
