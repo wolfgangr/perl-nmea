@@ -213,19 +213,20 @@ while (-d $tempfile_dir) {
 
 mkdir $tempfile_dir;
 
-$tempfile_prefix = sprintf("%s/%s-", $tempfile_dir, $basename);
+$tempfile_prefix = sprintf("%s/%s", $tempfile_dir, $basename);
 
 printf("dir: %s ; prefix: %s\n", $tempfile_dir , $tempfile_prefix);
 #=============~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------
 
-exit;
+# exit;
 
-$tempfile_prefix="./fig/test-";
+# $tempfile_prefix="./fig/test-";
 
-$time_suffix = `date +%F-%T`;
-chomp $time_suffix;
+# $time_suffix = `date +%F-%T`;
+# chomp $time_suffix;
 
-$tempfile_body = $tempfile_prefix . $time_suffix;
+# $tempfile_body = $tempfile_prefix . $time_suffix;
+$tempfile_body = $tempfile_prefix;
 $temppng  = $tempfile_body . '.png';
 $tempdata = $tempfile_body . '.data';
 $templog  = $tempfile_body . '.log';
