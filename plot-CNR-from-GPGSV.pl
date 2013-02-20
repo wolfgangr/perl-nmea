@@ -16,7 +16,7 @@
 # use DateTime::Tiny;   # cannot resolve backwards
 use Time::Local 'timegm_nocheck' ;	# tiny but what I need
 use Data::Dumper ;
-use Chart::Gnuplot;
+# use Chart::Gnuplot;  ... no advantage to add any obscurity layer .. use "| gnuplot" instead
 
 # in a data base, this might be tables
 @data =();	# collection of pointers to all sv x time data
@@ -27,7 +27,10 @@ use Chart::Gnuplot;
 
 # read from stdin
 
-while(<>) {
+$infile = $ARGV[0] or die ("usage: $0 someinputfile.name");
+open INFILE , $infile or die ("cannot read from input file named $infile");
+
+while(<INFILE>) {
 	# print $_;
 	chomp ; chop ; #  looks like chomp removes NL but leaves CR 
 	# ($qual, $data, $chskum) =~ /(\$GP\D{3})(.*)(,\*\d{2})/ ;
@@ -122,6 +125,8 @@ while(<>) {
 
 }
 
+close INFILE;
+
 #================
 # debuh print: show what we have now:
 print "======================== read complete =======================\n";
@@ -188,6 +193,33 @@ foreach $datapoint(@data) {
 print "====== calling gnuplot =========\n";
 
 $gnuplot = "/usr/bin/gnuplot";
+
+# (my $basename = $infile) =~ s/\.[^.]+$//;
+
+# $name =~ s{.*/}{};      # removes path  
+(my $pathbase = $infile)   =~ s{\.[^.]+$}{}; # removes extension
+(my $basename = $pathbase) =~ s{.*/}{};      # removes path
+
+printf("basename: >>%s<<, pathbase >>%s<<, infile: >>%s<<\n",   $basename , $pathbase , $infile);
+# exit;
+
+$tempfile_dir = $pathbase;
+my $i = 0;
+
+while (-d $tempfile_dir) {
+	$i++;
+	$tempfile_dir = sprintf("%s_%d", $pathbase, $i);
+}
+
+mkdir $tempfile_dir;
+
+$tempfile_prefix = sprintf("%s/%s-", $tempfile_dir, $basename);
+
+printf("dir: %s ; prefix: %s\n", $tempfile_dir , $tempfile_prefix);
+#=============~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------
+
+exit;
+
 $tempfile_prefix="./fig/test-";
 
 $time_suffix = `date +%F-%T`;
