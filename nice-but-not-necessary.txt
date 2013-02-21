@@ -14,7 +14,7 @@ Therefore, I also do not plan:
 * postcript / eps / svg output or whatever you might need to produce high quality publishable plots
 * x11 output, even if it might add insight, if you can interactively rotate 3D-plots
 
-And I do not want to reinvent the wheel called "anttool" from Takura Takasu.
+And I do not want to reinvent the wheel called "anttool" from Tomoji Takasu.
 So I have no plans (yet) to postprocess rtklib solution data or to analyse dual-reciver setups such as zero-baseline or short-baseline tests.
 
 But maybe I'll try to get anttool runnning on octave & linux instead of matlab & WIN

@@ -18,6 +18,7 @@ http://gnuplot.sourceforge.net/demo_4.6/
 and decide to switch to a native piped interface
 
 rewrite Chart::Gnuplot based code to piped interface
+provide a systematic file/folder data structure for intermediary and output files
 do some first code cleanup
 
 2013-02-19 Wolfgang Rosner

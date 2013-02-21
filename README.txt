@@ -2,8 +2,9 @@ If you torture your Data long enough, it finally will confess ;-)
 
 There are some nice tools and papers around that use carrier noise ratio of GPS receivers to assess antenna performance.
 
-Takura Takasu, author of rtklib:
+Tomoji Takasu, author of rtklib:
 http://gpspp.sakura.ne.jp/paper2005/isgps2008_paper_ttaka.pdf
+http://gpspp.sakura.ne.jp/anteva/anteva.htm
 
 Josef Gerstenberg in a German GPS forum
 http://www.kowoma.de/gpsforum/viewtopic.php?p=15374#p15374
