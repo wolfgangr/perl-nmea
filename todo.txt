@@ -11,3 +11,7 @@
 * 	try to perform spectral analysis to isolate interference based "Noise" from "real Noise"
 *	try to explore with multidimensional data visualisation tools like 
 	VTK, KitWare or ParaView
+* 	try to define a small number of key figures indicating antenna performance
+*	try to compare different setups pair-by-pair on base of these key figures (but non the correlation of raw data, as rtklib does!)
+
+
