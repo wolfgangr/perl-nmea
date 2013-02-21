@@ -1,0 +1,28 @@
+
+2013-02-21 Wolfgang Rosner
+create 
+README.txt
+to-do.txt
+nice-but-not-necessary.txt
+history.txt
+
+to get documentation and planning stuff out of the code
+
+
+2013-02-20 Wolfgang Rosner
+looks like things gain vloume ... so place it on github 
+URL: git@github.com:wolfgangr/perl-nmea.git
+
+learn that gnuplot offers much more than Chart::Gnuplot provides
+http://gnuplot.sourceforge.net/demo_4.6/
+and decide to switch to a native piped interface
+
+rewrite Chart::Gnuplot based code to piped interface
+do some first code cleanup
+
+2013-02-19 Wolfgang Rosner
+rearrange data for individual satellites and plot example for single SV, using Chart::Gnuplot cpan library
+
+2013-02-18 Wolfgang Rosner
+initial version with basic proof of concept:
+Read and parse NMEA and extract CNR over Elevation

@@ -1,0 +1,27 @@
+This is what I am not planing to implement:
+
+* A GUI, since you had to add 95 % interface effort to 5 % core functionality
+* A Windows version - Perl an Gnuplot may run there anyway, so good luck if it works
+* highly configurable command line options
+What might we configure?
+NMEA is standard (so I hope)
+If you don't need all output, delete it. Disk space is not that expensive any more.
+
+If you want to change gnuplot options, you always can call it from the command line and load the data in interactive operation. I will add a seperate log file with all gnuplot commands, so you have an accessible ressource of cut&paste.
+
+Therefore, I also do not plan:
+
+* postcript / eps / svg output or whatever you might need to produce high quality publishable plots
+* x11 output, even if it might add insight, if you can interactively rotate 3D-plots
+
+And I do not want to reinvent the wheel called "anttool" from Takura Takasu.
+So I have no plans (yet) to postprocess rtklib solution data or to analyse dual-reciver setups such as zero-baseline or short-baseline tests.
+
+But maybe I'll try to get anttool runnning on octave & linux instead of matlab & WIN
+However, this is another site of construction.
+
+February 21 2013
+Wolfgang Rosner
+wrosner@tirnet.de
+
+

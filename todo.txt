@@ -1,0 +1,13 @@
+*	plot CNR over elev for each of satellites
+* 	plot CNR over elev for all satellites together
+*       plot CNR (color coded) over elev x Azimuth for all satellites together
+	aka "skyplot"
+*	plot CNR, elevation, azimuth over time
+*	repeat Josef Gerstenberg's variance plot
+*	refine variance plot by comparing within satellite / all satellites 
+*	try to compute precise confidence figures using ANOVA analysis
+* 	compare against local moving average (binomial convolution filter), if possible,  including ANOVA
+* 	refine (integer valued) elev/ azimuth by time based interpolation
+* 	try to perform spectral analysis to isolate interference based "Noise" from "real Noise"
+*	try to explore with multidimensional data visualisation tools like 
+	VTK, KitWare or ParaView
