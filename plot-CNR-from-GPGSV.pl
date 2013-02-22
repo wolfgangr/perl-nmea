@@ -81,8 +81,8 @@ while(<INFILE>) {
 			my $sat_inV = shift @fields;
 
 			if ( $msg_num == 1 ) {
-				@current =()
-			}
+				@current =() 	# start a new sequence
+			}	
 			
 			while ( @ fields) {
 				my $svn = shift @fields;
@@ -153,17 +153,6 @@ foreach $datapoint(@data) {
 # print Dumper([@sv_snr[12]]);
 
 
-# so - what do we like to produce?
-# cmp master takasu: http://gpspp.sakura.ne.jp/anteva/anteva.htm
-# for each SV detailed analysis
-# ANOVA ... this vs other sats ... this elve vs smoothed curve
-# all sats simplified/aggregated together
-# same in animated gif???
-# skyplot cmp 
-#	http://gpspp.sakura.ne.jp/anteva/antmpc.htm
-#	http://gpspp.sakura.ne.jp/anteva/antsnr.htm
-# can we produce 3D polar / cylindric / color encoded?
-# alle Sats elev over time
 
 
 print "====== calling gnuplot =========\n";
@@ -190,42 +179,54 @@ printf("dir: %s ; prefix: %s\n", $tempfile_dir , $tempfile_prefix);
 
 # $tempfile_body = $tempfile_prefix . $time_suffix;
 $tempfile_body = $tempfile_prefix;
-$temppng  = $tempfile_body . '.png';
-$tempdata = $tempfile_body . '.data';
+
+
 $templog  = $tempfile_body . '.log';
+$tempcmd  = $tempfile_body . '.cmd';
+
+# for combined data output .. still to do
+$temppng_all  = $tempfile_body . '_all.png';
+$tempdata_all = $tempfile_body . '_all.data';
 
 
-# SV no 12 for first trial
-print "writing data....\n";
+foreach $SV (1 .. @svs) {
+	if (! ($hits = $svs[$SV])) { next ; }
 
-open (DATAFILE, ">".$tempdata) || error ("could not create temp data file $tempdata");
 
-foreach $i (0..$#{$sv_ele[12]}) {
-	printf DATAFILE ("%s %s\n", $sv_snr[12][$i], $sv_ele[12][$i] );
+	$temppng_sv  = sprintf ("%s_%03d.png", $tempfile_body , $SV);
+	$tempdata_sv = sprintf ("%s_%03d.data", $tempfile_body , $SV);
 
-}
+	printf ("writing data for SV# %d....\n", $SV);
 
-close DATAFILE || error ("could not close temp data file $tempdata");
+	open (DATAFILE, ">".$tempdata_sv) || error ("could not create temp data file $tempdata_sv");
 
-print "creating chart  \n";
+	foreach $i (0..$#{$sv_ele[$SV]}) {
+		printf DATAFILE ("%s %s\n", $sv_snr[$SV][$i], $sv_ele[$SV][$i] );
 
-$command= <<ENDOFCOMMAND;
+	}
+
+	close DATAFILE || error ("could not close temp data file $tempdata_sv");
+
+	printf ("creating chart for SV# %d....\n", $SV);
+
+	$command= <<ENDOFCOMMAND;
 set term png
-set output "$temppng"
+set output "$temppng_sv"
 set xrange [0:90]
 set yrange [0:50]
 set xlabel 'Elevation in deg'
 set ylabel 'CNR in dbHz'
-plot "$tempdata" using 2:1 with points
+plot "$tempdata_sv" using 2:1 with points
 
 ENDOFCOMMAND
 
-print $command;
+	print $command;
 
-open GNUPLOT, "| $gnuplot > $templog 2>&1" || error ("cannot open gnuplot")   ;
-print GNUPLOT $command    || error ("cannot send data to gnuplot") ;
-close GNUPLOT ;   
+	open GNUPLOT, "| $gnuplot > $templog 2>&1" || error ("cannot open gnuplot")   ;
+	print GNUPLOT $command    || error ("cannot send data to gnuplot") ;
+	close GNUPLOT ;   
 
+}
 
 exit ;
 ###################################################################

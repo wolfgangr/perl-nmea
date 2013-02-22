@@ -1,4 +1,4 @@
-*	plot CNR over elev for each of satellites
+...	plot CNR over elev for each of satellites
 * 	plot CNR over elev for all satellites together
 *       plot CNR (color coded) over elev x Azimuth for all satellites together
 	aka "skyplot"
@@ -12,6 +12,7 @@
 *	try to explore with multidimensional data visualisation tools like 
 	VTK, KitWare or ParaView
 * 	try to define a small number of key figures indicating antenna performance
+*	allow Glonass Format ($GL instead of $GP?)
 *	try to compare different setups pair-by-pair on base of these key figures (but non the correlation of raw data, as rtklib does!)
-
+*	switch to streaming processing to reduce huge mem requirement
 

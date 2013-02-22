@@ -1,3 +1,6 @@
+2013-02-22 Wolfgang Rosner
+create data and chart file for each SV
+
 
 2013-02-21 Wolfgang Rosner
 create 
