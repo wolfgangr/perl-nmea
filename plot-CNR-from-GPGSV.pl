@@ -26,6 +26,7 @@ use Data::Dumper ;
 $infile = $ARGV[0] or die ("usage: $0 someinputfile.name");
 open INFILE , $infile or die ("cannot read from input file named $infile");
 
+printf ("parsing input file %s\n",  $infile);
 
 # read input file
 while(<INFILE>) {
@@ -110,6 +111,7 @@ close INFILE;
 #================
 # debug print: show what we have now:
 print "======================== read complete =======================\n";
+print " ... rearranging data ... \n";
 
 # print Dumper([@data]);
 # print "--------------------------------------\n";
@@ -153,7 +155,7 @@ foreach $datapoint(@data) {
 # print Dumper([@sv_snr[12]]);
 
 
-
+#==============================================================================================
 
 print "====== calling gnuplot =========\n";
 
@@ -186,8 +188,8 @@ $tempcmd  = $tempfile_body . '.cmd';
 
 # for combined data output .. still to do
 $temppng_all  = $tempfile_body . '_all.png';		# rectangle plot of all sats
-$temppng_sky  = $tempfile_body . '_sky.png';		# polar skyplot color coded
-$tempdata_all = $tempfile_body . '_all.data';
+# $temppng_sky  = $tempfile_body . '_sky.png';		# polar skyplot color coded
+# $tempdata_all = $tempfile_body . '_all.data';
 
 # header for all SV on top of each other
 $command_all = <<ENDOFCMDALL;
@@ -200,6 +202,19 @@ set ylabel 'CNR in dbHz'
 set multiplot
 ENDOFCMDALL
 
+# animated GIF with all SV in sequence
+$tempgif_anim  = $tempfile_body . '_anim.gif';
+
+$command_anim = <<ENDOFCMDANIM;
+set term  gif animate opt delay 100
+set output "$tempgif_anim"
+set xrange [0:90]
+set yrange [0:50]
+set xlabel 'Elevation in deg'
+set ylabel 'CNR in dbHz'
+ENDOFCMDANIM
+
+
 
 foreach $SV (1 .. @svs) {
 	if (! ($hits = $svs[$SV])) { next ; }
@@ -208,7 +223,7 @@ foreach $SV (1 .. @svs) {
 	$temppng_sv  = sprintf ("%s_%03d.png", $tempfile_body , $SV);
 	$tempdata_sv = sprintf ("%s_%03d.data", $tempfile_body , $SV);
 
-	printf ("writing data for SV# %d....\n", $SV);
+	printf ("writing data for SV# %d with %d data points ... ", $SV, $hits);
 
 	open (DATAFILE, ">".$tempdata_sv) || error ("could not create temp data file $tempdata_sv");
 
@@ -238,11 +253,21 @@ ENDOFCOMMAND
 
 	# add entry for multi SV plotplot "
 	$command_all .= "plot \"$tempdata_sv\" using 2:1 with points lt $SV\n";
+
+	# add entry for multi SV animated gif
+	$command_anim .= "plot \"$tempdata_sv\" using 2:1 with points lt $SV\n";
+	
 }
 
+print "rendering combined plot\n";
 # render the combined plot
 gnuplotcmd($command_all);
 
+print "rendering animated gif plot\n";
+# render animated gif
+gnuplotcmd($command_anim);
+
+print " ======= DONE ==========\n";
 exit ;
 ###################################################################
 sub error {
