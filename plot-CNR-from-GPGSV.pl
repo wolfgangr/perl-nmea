@@ -185,8 +185,20 @@ $templog  = $tempfile_body . '.log';
 $tempcmd  = $tempfile_body . '.cmd';
 
 # for combined data output .. still to do
-$temppng_all  = $tempfile_body . '_all.png';
+$temppng_all  = $tempfile_body . '_all.png';		# rectangle plot of all sats
+$temppng_sky  = $tempfile_body . '_sky.png';		# polar skyplot color coded
 $tempdata_all = $tempfile_body . '_all.data';
+
+# header for all SV on top of each other
+$command_all = <<ENDOFCMDALL;
+set term png
+set output "$temppng_all"
+set xrange [0:90]
+set yrange [0:50]
+set xlabel 'Elevation in deg'
+set ylabel 'CNR in dbHz'
+set multiplot
+ENDOFCMDALL
 
 
 foreach $SV (1 .. @svs) {
@@ -209,6 +221,7 @@ foreach $SV (1 .. @svs) {
 
 	printf ("creating chart for SV# %d....\n", $SV);
 
+	# create single plot for each SV	 
 	$command= <<ENDOFCOMMAND;
 set term png
 set output "$temppng_sv"
@@ -216,12 +229,19 @@ set xrange [0:90]
 set yrange [0:50]
 set xlabel 'Elevation in deg'
 set ylabel 'CNR in dbHz'
-plot "$tempdata_sv" using 2:1 with points
+plot "$tempdata_sv" using 2:1 with points lt $SV
 
 ENDOFCOMMAND
 
 	gnuplotcmd($command);
+
+
+	# add entry for multi SV plotplot "
+	$command_all .= "plot \"$tempdata_sv\" using 2:1 with points lt $SV\n";
 }
+
+# render the combined plot
+gnuplotcmd($command_all);
 
 exit ;
 ###################################################################
