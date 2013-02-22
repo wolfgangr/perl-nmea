@@ -220,12 +220,7 @@ plot "$tempdata_sv" using 2:1 with points
 
 ENDOFCOMMAND
 
-	print $command;
-
-	open GNUPLOT, "| $gnuplot > $templog 2>&1" || error ("cannot open gnuplot")   ;
-	print GNUPLOT $command    || error ("cannot send data to gnuplot") ;
-	close GNUPLOT ;   
-
+	gnuplotcmd($command);
 }
 
 exit ;
@@ -235,4 +230,16 @@ sub error {
         die ("Error: " . $errmessg );
 }
 
+# cave: global vars $tempcmd, $gnuplot !
+sub gnuplotcmd {
+	my ($cmd) = shift(@_);
 
+	open CMDLOG, ">>", "$tempcmd" || error ("cannot open $tempcmd")   ;
+	print CMDLOG $cmd;
+	close CMDLOG ; 
+
+	open GNUPLOT, "| $gnuplot > $templog 2>&1" || error ("cannot open gnuplot")   ;
+	print GNUPLOT $cmd    || error ("cannot send data to gnuplot") ;
+	close GNUPLOT ;   
+
+}
