@@ -87,9 +87,9 @@ while(<INFILE>) {
 			
 			while ( @ fields) {
 				my $svn = shift @fields;
-				my $ele = shift @fields;
-				my $azi = shift @fields;
-				my $snr = shift @fields;
+				my $ele = shift @fields // -1;	# need Perl > 5.10 for // "defined or"
+				my $azi = shift @fields // -1;
+				my $snr = shift @fields // -1;
 				### printf ("sat no %i elevation %i azimuth %i SNR %i\n", $svn, $ele, $azi, $snr); 
 				push (@current, [0, $svn, $ele, $azi, $snr ] );
 			}
