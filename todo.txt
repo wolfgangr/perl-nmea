@@ -1,5 +1,5 @@
-...	plot CNR over elev for each of satellites
-* 	plot CNR over elev for all satellites together
+OK	plot CNR over elev for each of satellites
+OK 	plot CNR over elev for all satellites together
 *       plot CNR (color coded) over elev x Azimuth for all satellites together
 	aka "skyplot"
 *	plot CNR, elevation, azimuth over time

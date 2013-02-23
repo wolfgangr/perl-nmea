@@ -1,5 +1,8 @@
 2013-02-22 Wolfgang Rosner
 create data and chart file for each SV
+create combined data and chart file for all SV
+create animated gif for a sequence of each SV data
+rearrange data columns to prepare for skyplot
 
 
 2013-02-21 Wolfgang Rosner
