@@ -1,8 +1,10 @@
 OK	plot CNR over elev for each of satellites
 OK 	plot CNR over elev for all satellites together
-*       plot CNR (color coded) over elev x Azimuth for all satellites together
+...     plot CNR (color coded) over elev x Azimuth for all satellites together
 	aka "skyplot"
+	.. needs refinement ???
 ...	plot CNR, elevation, azimuth over time
+	.. come back after smoothing angles
 *	repeat Josef Gerstenberg's variance plot
 *	refine variance plot by comparing within satellite / all satellites 
 *	try to compute precise confidence figures using ANOVA analysis

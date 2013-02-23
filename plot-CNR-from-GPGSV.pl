@@ -234,6 +234,11 @@ set xrange [$data[0][0]-946684800:$data[-1][0]-946684800]
 set ylabel 'Elevation in deg'
 ENDOFCMDET
 
+# polar skyplot color coded
+$tempdata_sky  = $tempfile_body . '_sky.data';	
+$temppng_sky  = $tempfile_body . '_sky.png';		
+
+open (SKYDATA, ">".$tempdata_sky) || error ("could not create temp data file $tempdata_sky");
 
 
 foreach $SV (1 .. @svs) {
@@ -254,10 +259,19 @@ foreach $SV (1 .. @svs) {
 			$sv_azi[$SV][$i] ,
 			$sv_snr[$SV][$i] 
 		);
-
+		
+		# convert polar data for skyplot
+		printf 	SKYDATA ("%s %s %s\n",
+			# polar2xy ( angle, radius) ; angle in deg
+			# azimuth counts clockwise, elevation from zenith down
+			polar2xy(-$sv_azi[$SV][$i], 90 - $sv_ele[$SV][$i]),
+			$sv_snr[$SV][$i] 
+		);
 	}
 
 	close DATAFILE || error ("could not close temp data file $tempdata_sv");
+
+	print SKYDATA "\n" ;	# does an empty line seperate curves??
 
 	printf ("creating chart for SV# %d....\n", $SV);
 
@@ -287,6 +301,23 @@ ENDOFCOMMAND
 	$command_et .= "plot \"$tempdata_sv\" using 1:2 with lines lt $SV\n";
 }
 
+close SKYDATA;
+
+print "rendering skyplot\n";
+$command_sky = <<ENDOFCMDSKY;
+# skyplot of SNR vs polar elevation/azimuth
+set term png
+set output "$temppng_sky"
+set size square
+set view 0 , 270 , 1.5 ,1
+unset border
+unset tics
+set cbtics
+splot "$tempdata_sky" u 1:2:3 w p lc palette pt 7
+ENDOFCMDSKY
+
+gnuplotcmd($command_sky);
+
 print "rendering combined plot\n";
 # render the combined plot
 gnuplotcmd($command_all);
@@ -313,10 +344,20 @@ sub gnuplotcmd {
 
 	open CMDLOG, ">>", "$tempcmd" || error ("cannot open $tempcmd")   ;
 	print CMDLOG $cmd;
+	print CMDLOG "\n";
 	close CMDLOG ; 
 
 	open GNUPLOT, "| $gnuplot > $templog 2>&1" || error ("cannot open gnuplot")   ;
 	print GNUPLOT $cmd    || error ("cannot send data to gnuplot") ;
 	close GNUPLOT ;   
 
+}
+
+# polar2xy ( angle, radius) ; angle in deg
+sub polar2xy {
+	use constant PI => (4 * atan2 (1, 1));
+	my ($angle, $radius) = @_;
+	my $x = $radius * cos ( $angle * PI/180);
+	my $y = $radius * sin ( $angle * PI/180);
+	return($x, $y);
 }
