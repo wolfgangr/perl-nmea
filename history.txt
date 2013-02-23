@@ -1,3 +1,6 @@
+2013-02-23 Wolfgang Rosner
+add elevation over time
+
 2013-02-22 Wolfgang Rosner
 create data and chart file for each SV
 create combined data and chart file for all SV

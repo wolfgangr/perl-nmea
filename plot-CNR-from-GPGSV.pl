@@ -186,7 +186,7 @@ $tempfile_body = $tempfile_prefix;
 
 
 $templog  = $tempfile_body . '.log';
-$tempcmd  = $tempfile_body . '.cmd';
+$tempcmd  = $tempfile_body . '.gnu';
 
 # for combined data output .. still to do
 $temppng_all  = $tempfile_body . '_all.png';		# rectangle plot of all sats
@@ -195,6 +195,7 @@ $temppng_all  = $tempfile_body . '_all.png';		# rectangle plot of all sats
 
 # header for all SV on top of each other
 $command_all = <<ENDOFCMDALL;
+#  all SNR over elev scatter on top of each other
 set term png
 set output "$temppng_all"
 set xrange [0:90]
@@ -208,6 +209,7 @@ ENDOFCMDALL
 $tempgif_anim  = $tempfile_body . '_anim.gif';
 
 $command_anim = <<ENDOFCMDANIM;
+# animated gif for all SNR over elev scatter
 set term  gif animate opt delay 100
 set output "$tempgif_anim"
 set xrange [0:90]
@@ -215,6 +217,22 @@ set yrange [-1:50]
 set xlabel 'Elevation in deg'
 set ylabel 'CNR in dbHz'
 ENDOFCMDANIM
+
+# elevation by time
+$temppng_et = $tempfile_body . '_et.png';
+
+$command_et = <<ENDOFCMDET;
+# elevation over time by SV
+set term png
+set output "$temppng_et"
+set yrange [-1:90]
+set multiplot
+set xdata time
+set timefmt "%s"
+set format x "%H:%M"
+set xrange [$data[0][0]-946684800:$data[-1][0]-946684800]
+set ylabel 'Elevation in deg'
+ENDOFCMDET
 
 
 
@@ -245,6 +263,7 @@ foreach $SV (1 .. @svs) {
 
 	# create single plot for each SV	 
 	$command= <<ENDOFCOMMAND;
+# plot for SV # $SV
 set term png
 set output "$temppng_sv"
 set xrange [0:90]
@@ -264,6 +283,8 @@ ENDOFCOMMAND
 	# add entry for multi SV animated gif
 	$command_anim .= "plot \"$tempdata_sv\" using 2:4 with points lt $SV\n";
 	
+	# add entry for multi SV animated gif
+	$command_et .= "plot \"$tempdata_sv\" using 1:2 with lines lt $SV\n";
 }
 
 print "rendering combined plot\n";
@@ -273,6 +294,10 @@ gnuplotcmd($command_all);
 print "rendering animated gif plot\n";
 # render animated gif
 gnuplotcmd($command_anim);
+
+print "rendering elevation over time\n";
+# render animated gif
+gnuplotcmd($command_et);
 
 print " ======= DONE ==========\n";
 exit ;
