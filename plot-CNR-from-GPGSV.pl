@@ -108,7 +108,7 @@ while(<INFILE>) {
 
 close INFILE;
 
-#================
+#===============================================================================
 # debug print: show what we have now:
 print "======================== read complete =======================\n";
 print " ... rearranging data ... \n";
@@ -161,14 +161,16 @@ print "====== calling gnuplot =========\n";
 
 $gnuplot = "/usr/bin/gnuplot";
 
+#### build temporary folder and file name structure
+# separate path/basename.extension
 (my $pathbase = $infile)   =~ s{\.[^.]+$}{}; # removes extension
 (my $basename = $pathbase) =~ s{.*/}{};      # removes path
 
 printf("basename: >>%s<<, pathbase >>%s<<, infile: >>%s<<\n",   $basename , $pathbase , $infile);
 
+# create a dir named pathase, append sequential number if already exists
 $tempfile_dir = $pathbase;
 my $i = 0;
-
 while (-d $tempfile_dir) {
 	$i++;
 	$tempfile_dir = sprintf("%s_%d", $pathbase, $i);
@@ -196,7 +198,7 @@ $command_all = <<ENDOFCMDALL;
 set term png
 set output "$temppng_all"
 set xrange [0:90]
-set yrange [0:50]
+set yrange [-1:50]
 set xlabel 'Elevation in deg'
 set ylabel 'CNR in dbHz'
 set multiplot
@@ -209,7 +211,7 @@ $command_anim = <<ENDOFCMDANIM;
 set term  gif animate opt delay 100
 set output "$tempgif_anim"
 set xrange [0:90]
-set yrange [0:50]
+set yrange [-1:50]
 set xlabel 'Elevation in deg'
 set ylabel 'CNR in dbHz'
 ENDOFCMDANIM
@@ -227,8 +229,13 @@ foreach $SV (1 .. @svs) {
 
 	open (DATAFILE, ">".$tempdata_sv) || error ("could not create temp data file $tempdata_sv");
 
-	foreach $i (0..$#{$sv_ele[$SV]}) {
-		printf DATAFILE ("%s %s\n", $sv_snr[$SV][$i], $sv_ele[$SV][$i] );
+	foreach $i (0..$#{$sv_time[$SV]}) {
+		printf DATAFILE ("%s %s %s %s\n", 
+			$sv_time[$SV][$i] ,
+			$sv_ele[$SV][$i] ,
+			$sv_azi[$SV][$i] ,
+			$sv_snr[$SV][$i] 
+		);
 
 	}
 
@@ -241,10 +248,10 @@ foreach $SV (1 .. @svs) {
 set term png
 set output "$temppng_sv"
 set xrange [0:90]
-set yrange [0:50]
+set yrange [-1:50]
 set xlabel 'Elevation in deg'
 set ylabel 'CNR in dbHz'
-plot "$tempdata_sv" using 2:1 with points lt $SV
+plot "$tempdata_sv" using 2:4 with points lt $SV
 
 ENDOFCOMMAND
 
@@ -252,10 +259,10 @@ ENDOFCOMMAND
 
 
 	# add entry for multi SV plotplot "
-	$command_all .= "plot \"$tempdata_sv\" using 2:1 with points lt $SV\n";
+	$command_all .= "plot \"$tempdata_sv\" using 2:4 with points lt $SV\n";
 
 	# add entry for multi SV animated gif
-	$command_anim .= "plot \"$tempdata_sv\" using 2:1 with points lt $SV\n";
+	$command_anim .= "plot \"$tempdata_sv\" using 2:4 with points lt $SV\n";
 	
 }
 
