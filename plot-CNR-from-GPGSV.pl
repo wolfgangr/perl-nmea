@@ -14,6 +14,8 @@
 
 use Time::Local 'timegm_nocheck' ;	# tiny but what I need
 use Data::Dumper ;
+# use Math::Interpolate qw(linear_interpolate robust_interpolate);
+use Math::Spline;
 
 # in a data base, this might be tables
 @data =();	# collection of pointers to all sv x time data
@@ -154,6 +156,62 @@ foreach $datapoint(@data) {
 # print Dumper([@sv_ele[12]]);
 # print Dumper([@sv_snr[12]]);
 
+#==============================================================================================
+# interpolate AZI and ELE between integer jumps
+print "inerpolating AZI and ELE...\n";
+
+foreach $SV (1 .. @svs) {
+	if (! ($hits = $svs[$SV])) { next ; }
+	
+	# arrays to collect support points
+	$sv_azi_st[$SV] = [];
+	$sv_azi_sa[$SV] = [];
+	$sv_azi_ip[$SV] = [];
+
+	$sv_ele_st[$SV] = [];
+	$sv_ele_se[$SV] = [];
+	$sv_ele_ip[$SV] = [];
+
+	my $last_ta = $sv_time[$SV][0];
+	my $last_aa = $sv_azi[$SV][0];
+	my $last_te = $sv_time[$SV][0];
+	my $last_ee = $sv_ele[$SV][0];
+
+	# search support point at jumps of azi / ele values
+	foreach $i (1..$#{$sv_time[$SV]}) {
+		if ($last_aa != $sv_azi[$SV][$i]) {
+			# azi step found
+			push @{$sv_azi_st[$SV]}, ( 0.5 * ($last_ta + $sv_time[$SV][$i])) ;
+			push @{$sv_azi_sa[$SV]}, ( 0.5 * ($last_aa + $sv_azi[$SV][$i])) ;
+			$last_ta = $sv_time[$SV][$i];
+			$last_aa = $sv_azi[$SV][$i];
+		}
+		if ($last_ee != $sv_ele[$SV][$i]) {
+			# ele step found
+			push @{$sv_ele_st[$SV]}, ( 0.5 * ($last_te + $sv_time[$SV][$i])) ;
+			push @{$sv_ele_se[$SV]}, ( 0.5 * ($last_ee + $sv_ele[$SV][$i])) ;
+			$last_te = $sv_time[$SV][$i];
+			$last_ee = $sv_ele[$SV][$i];
+		}
+	}
+
+	# now use the spline
+	printf "---------- SV %d", $SV;
+
+	print Dumper([@sv_azi_st[$SV]]);
+	print Dumper([@sv_azi_sa[$SV]]);
+
+	print Dumper([@sv_ele_st[$SV]]);
+	print Dumper([@sv_ele_se[$SV]]);
+	
+	my $spline_az = new Math::Spline(\@{$sv_azi_st[$SV]}, \@{$sv_azi_sa[$SV]});
+	my $spline_el = new Math::Spline(\@{$sv_ele_st[$SV]}, \@{$sv_ele_sa[$SV]});
+
+	foreach $i (1..$#{$sv_time[$SV]}) {
+		$sv_azi_ip[$SV][$i] = $spline_az->evaluate($sv_time[$SV][$i]);
+		$sv_ele_ip[$SV][$i] = $spline_el->evaluate($sv_time[$SV][$i]);
+	}
+}
 
 #==============================================================================================
 
