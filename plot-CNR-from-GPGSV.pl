@@ -384,7 +384,7 @@ set view 0 , 270 , 1.5 ,1
 unset border
 unset tics
 set cbtics
-splot "$tempdata_sky" u 1:2:3 w p lc palette pt 7
+splot "$tempdata_sky" u 1:2:3 w l lw 3 lc palette pt 7
 ENDOFCMDSKY
 
 gnuplotcmd($command_sky);
@@ -468,7 +468,7 @@ printf ("ele: %d, classes: %d, samples %d, sum %d , sum-square: %d\n",
 	$elevs_cnt, $ele_x_sv_cls, $ele_x_sv_cnt, $ele_x_sv_sum, $ele_x_sv_sum2sq );
 
 $overall_mean_snr = $ele_x_sv_sum / $ele_x_sv_cnt;
-$overall_varc_snr = ($ele_x_sv_sum2sq - ($ele_x_sv_sum ^2 / $ele_x_sv_cnt))  /
+$overall_varc_snr = ($ele_x_sv_sum2sq - ($ele_x_sv_sum * $ele_x_sv_sum / $ele_x_sv_cnt))  /
 					($ele_x_sv_cnt-1) ;
 $overall_stdev_snr = sqrt($overall_varc_snr);
 
@@ -476,9 +476,9 @@ printf ("overall mean: %f; variance: %f;  stddev: %f",
 	$overall_mean_snr, $overall_varc_snr, $overall_stdev_snr);
 
 
-# calculating and writing plottables
+# ----------------  calculating and writing plottables
 
-# polar skyplot color coded
+# standard dev over all satellites per elevation
 $tempdata_sdev = $tempfile_body . '_sdev.data';
 $temppng_sdev = $tempfile_body . '_sdev.png'; 
 
@@ -488,7 +488,7 @@ foreach $ele (1 .. 90 ) {
 	unless ($ele_cnt_sum[$ele] > 1) { next ; }
 
 	$ele_mean[$ele] = $ele_sum_sum[$ele] / $ele_cnt_sum[$ele] ;
-	$ele_varc[$ele] = ($ele_sum2sq_sum[$ele] - ($ele_sum_sum[$ele] ^2 /
+	$ele_varc[$ele] = ($ele_sum2sq_sum[$ele] - ($ele_sum_sum[$ele] * $ele_sum_sum[$ele]  /
 		 $ele_cnt_sum[$ele]))  /  ($ele_cnt_sum[$ele]-1) ;
 	$ele_stdev[$ele] = sqrt($ele_varc[$ele]);
 
@@ -498,23 +498,76 @@ foreach $ele (1 .. 90 ) {
 
 close SDEVDATA;
 
-#  217  set xrange [0:90]
-#  218  set yrange [-1:50]
-#  216  plot "log-2013-02-16-23-16_1/log-2013-02-16-23-16_sdev.data" using 1:2:4 w yerrorbars
-
 
 $command_sdev = <<ENDOFCMDSDEV;
 # plot standard dev over all satellites per elevation
 set term png
 set output "$temppng_sdev"
 set xrange [0:90]
-set yrange [-10:70]
+set yrange [0:50]
 set xlabel 'Elevation in deg'
 set ylabel 'CNR in dbHz'
+set multiplot
+plot "$tempdata_sdev" using 1:2 w lines lw 3
 plot "$tempdata_sdev" using 1:2:4 w yerrorbars
+
 ENDOFCMDSDEV
 
 gnuplotcmd($command_sdev);
+
+
+# standard dev over elevation for each sv
+ 
+foreach $sv(1 .. @svs) {
+	unless ($sv_cnt_sum[$sv] > 1) { next ; }
+
+	$sv_mean_snr[$sv] = $sv_sum_sum[$sv] / $sv_cnt_sum[$sv] ;
+	$sv_varc_snr[$sv] = ($sv_sum2sq_sum[$sv] - ( $sv_sum_sum[$sv] * $sv_sum_sum[$sv] / 				$sv_cnt_sum[$sv])) /	($sv_cnt_sum[$sv]-1) ;
+	$sv_stdev_snr[$sv] = sqrt($sv_varc_snr[$sv]);
+
+	printf ("statiscs for SV ' %3d: mean: %9f; variance: %9f; stddev: %9f",
+		$sv, $sv_mean_snr[$sv], $sv_varc_snr[$sv] , $sv_stdev_snr[$sv]);
+
+	$temppng_sv_sdev = sprintf ("%s_sdev_%03d.png", $tempfile_body , $sv);
+	$tempdata_sv_sdev = sprintf ("%s_sdev_%03d.data", $tempfile_body , $sv);
+
+	printf ("   ... writing data ... \n");
+
+	open (SVSDEVDATA, ">".$tempdata_sv_sdev) || 
+			error ("could not create temp data file $tempdata_sv_sdev");
+
+	foreach $ele (1 .. 90 ) {
+		unless ($sv_ele_V_cnt[$sv][$ele] > 1) { next ; }
+
+		$sv_ele_mean[$sv][$ele] = $sv_ele_V_sum[$sv][$ele] / $sv_ele_V_cnt[$sv][$ele] ;
+		$sv_ele_varc[$sv][$ele] = ( $sv_ele_V_sum2sq[$sv][$ele] -
+			( $sv_ele_V_sum[$sv][$ele] * $sv_ele_V_sum[$sv][$ele] /
+			$sv_ele_V_cnt[$sv][$ele] )) / ( $sv_ele_V_cnt[$sv][$ele]- 1) ;
+		$sv_ele_stdev[$sv][$ele] = sqrt($sv_ele_varc[$sv][$ele]);
+
+		printf SVSDEVDATA ("%d %f %f %f\n", $ele,
+		$sv_ele_mean[$sv][$ele], $sv_ele_varc[$sv][$ele], $sv_ele_stdev[$sv][$ele]);
+	}
+
+	close SVSDEVDATA;
+
+	$command_sv_sdev = <<ENDOFCMDSVSDEV;
+# plot standard dev over all satellites per elevation
+set term png
+set output "$temppng_sv_sdev"
+set xrange [0:90]
+set yrange [0:50]
+set xlabel 'Elevation in deg'
+set ylabel 'CNR in dbHz'
+set multiplot
+plot "$tempdata_sv_sdev" using 1:2 w lines lw 3 lt $sv
+plot "$tempdata_sv_sdev" using 1:2:4 w yerrorbars lt $sv
+ENDOFCMDSVSDEV
+
+	gnuplotcmd($command_sv_sdev);
+	
+}
+
 
 print " ======= DONE ==========\n";
 exit ;

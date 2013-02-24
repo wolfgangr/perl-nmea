@@ -5,7 +5,7 @@ OK 	plot CNR over elev for all satellites together
 	.. needs refinement ???
 ...	plot CNR, elevation, azimuth over time
 	.. come back after smoothing angles
-...	repeat Josef Gerstenberg's variance plot
+OK	repeat Josef Gerstenberg's variance plot
 *	refine variance plot by comparing within satellite / all satellites 
 *	try to compute precise confidence figures using ANOVA analysis
 * 	compare against local moving average (binomial convolution filter), if possible,  including ANOVA
