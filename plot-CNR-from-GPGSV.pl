@@ -384,7 +384,9 @@ set view 0 , 270 , 1.5 ,1
 unset border
 unset tics
 set cbtics
-splot "$tempdata_sky" u 1:2:3 w l lw 3 lc palette pt 7
+set cbrange[20:60]
+set palette defined (20 "blue", 40 "green", 45 "yellow", 55 "red", 60 "#ffaaaa" )
+splot "$tempdata_sky" u 1:2:3 w p lc palette pt 7
 ENDOFCMDSKY
 
 gnuplotcmd($command_sky);
