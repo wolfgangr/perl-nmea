@@ -1,6 +1,7 @@
 2013-02-23 Wolfgang Rosner
 add elevation over time
 add skyplot (well, rough start...)
+add interpolation of azimuth and eleveation between integer jumps
 
 2013-02-22 Wolfgang Rosner
 create data and chart file for each SV

@@ -9,7 +9,7 @@ OK 	plot CNR over elev for all satellites together
 *	refine variance plot by comparing within satellite / all satellites 
 *	try to compute precise confidence figures using ANOVA analysis
 * 	compare against local moving average (binomial convolution filter), if possible,  including ANOVA
-* 	refine (integer valued) elev/ azimuth by time based interpolation
+OK 	refine (integer valued) elev/ azimuth by time based interpolation
 * 	try to perform spectral analysis to isolate interference based "Noise" from "real Noise"
 *	try to explore with multidimensional data visualisation tools like 
 	VTK, KitWare or ParaView
