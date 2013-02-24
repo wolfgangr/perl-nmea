@@ -208,13 +208,11 @@ foreach $SV (1 .. @svs) {
 
 
 	# now use the spline
-	printf "---------- SV %d", $SV;
-
-	print Dumper([@sv_azi_st[$SV]]);
-	print Dumper([@sv_azi_sa[$SV]]);
-
-	print Dumper([@sv_ele_st[$SV]]);
-	print Dumper([@sv_ele_se[$SV]]);
+	# printf "---------- SV %d", $SV;
+	# print Dumper([@sv_azi_st[$SV]]);
+	# print Dumper([@sv_azi_sa[$SV]]);
+	# print Dumper([@sv_ele_st[$SV]]);
+	# print Dumper([@sv_ele_se[$SV]]);
 	
 	my $spline_az = new Math::Spline(\@{$sv_azi_st[$SV]}, \@{$sv_azi_sa[$SV]});
 	my $spline_el = new Math::Spline(\@{$sv_ele_st[$SV]}, \@{$sv_ele_se[$SV]});
@@ -402,6 +400,72 @@ gnuplotcmd($command_anim);
 print "rendering elevation over time\n";
 # render animated gif
 gnuplotcmd($command_et);
+
+
+#=========================================================================0
+print "collecting statistical values\n";
+# we might initialize arrays like
+#	@foo = map {[ (0) x $x ]} 1 .. $y
+
+@sv_ele_V_cnt = map {[ (0) x 90 ]} (1 .. @svs) ; 
+@sv_ele_V_sum = map {[ (0) x 90 ]} (1 .. @svs) ;
+@sv_ele_V_sum2sq = map {[ (0) x 90 ]} (1 .. @svs) ;
+
+# collect each sv  x elev-1-deg interval
+foreach $dp(@data) {
+	my $svn = $dp->[1];
+	my $ele = $dp->[2];
+	my $snr = $dp->[4];
+
+	unless ( $snr > 0 ) {	next ; } 	# exclude 0 and -1 SNR values
+	
+	$sv_ele_V_cnt[$svn][$ele] ++ ;		# count occurances
+	$sv_ele_V_sum[$svn][$ele] += $snr ;		# sum
+	$sv_ele_V_sum2sq[$svn][$ele] += $snr * $snr ;	# sum of squares
+}
+
+# aggregates over satellites
+foreach $sv(1 .. @svs) {
+	unless (($hits = $svs[$sv])) { next ; }
+	foreach $ele (0 .. 90 ) {
+		unless ( $sv_ele_V_cnt[$sv][$ele] ) { next ; }
+		$sv_cnt[$sv] ++;	# number of elev intervals in track
+		$sv_cnt_sum[$sv] += $sv_ele_V_cnt[$sv][$ele];
+		$sv_sum_sum[$sv] += $sv_ele_V_sum[$sv][$ele];
+		$sv_sum2sq_sum[$sv] += $sv_ele_V_sum2sq[$sv][$ele];
+	}
+	$svs_cnt ++ ;		# number of SVs with data
+	$sv_x_ele_cls += $sv_cnt[$sv];	# number of classes
+	$sv_x_ele_cnt += $sv_cnt_sum[$sv];  # number of datapoints
+	$sv_x_ele_sum += $sv_sum_sum[$sv];
+	$sv_x_ele_sum2sq += $sv_sum2sq_sum[$sv];
+}
+
+# aggregates over elev intervals
+foreach $ele (0 .. 90 ) {
+	# no obvious skip condition?
+	foreach $sv(1 .. @svs) {
+		# if (! ($hits = $svs[$sv])) { next ; }
+		unless ( $sv_ele_V_cnt[$sv][$ele] ) { next ; }
+
+		$ele_cnt[$ele] ++;	# number sv in this elev interval
+		$ele_cnt_sum[$ele] += $sv_ele_V_cnt[$sv][$ele];
+		$ele_sum_sum[$ele] += $sv_ele_V_sum[$sv][$ele];
+		$ele_sum2sq_sum[$ele] += $sv_ele_V_sum2sq[$sv][$ele];
+	}
+	$elevs_cnt ++ ;		# number of elevs with data
+	$ele_x_sv_cls += $ele_cnt[$ele];  # number of classes
+	$ele_x_sv_cnt += $ele_cnt_sum[$ele]; # number of datapoints
+	$ele_x_sv_sum += $ele_sum_sum[$ele];
+	$ele_x_sv_sum2sq += $ele_sum2sq_sum[$ele];
+}
+
+
+printf ("SVs: %d, classes: %d, samples %d, sum %d , sum-square: %d\n",
+	 $svs_cnt, $sv_x_ele_cls, $sv_x_ele_cnt, $sv_x_ele_sum, $sv_x_ele_sum2sq );
+
+printf ("ele: %d, classes: %d, samples %d, sum %d , sum-square: %d\n",
+	$elevs_cnt, $ele_x_sv_cls, $ele_x_sv_cnt, $ele_x_sv_sum, $ele_x_sv_sum2sq );
 
 print " ======= DONE ==========\n";
 exit ;
