@@ -20,6 +20,8 @@ while (-e $outfile) {
 
 open (OUTFILE , ">".$outfile) || die ("cannot open outfile $outfile");
 
+print ("writing output to file $outfile \n");
+
 my $lines_tot = 0;
 my $lines_tot_out= 0;
 
@@ -61,10 +63,13 @@ foreach $infile (@infiles) {
 		unless ($ele_prev == $ele_int and $azi_prev == $azi_int) {
 			# writing aggregated data
 			foreach my $snr_ (sort keys %snr_list) {
+				my $n = $snr_list{$snr_}->[0] ;
+				unless ($n) { next ; }
+				
 				# bookkeeping
 				$lines_out ++;
 				$lines_tot_out++;				
-				my $n = $snr_list{$snr_}->[0] ;
+				
 				printf OUTFILE ("%f %f %d %d\n", 
 					$snr_list{$snr_}->[1] / $n ,
 					$snr_list{$snr_}->[2] / $n ,
@@ -76,6 +81,7 @@ foreach $infile (@infiles) {
 			# force init sequence as in start
 			$ele_prev = $ele_int;
 			$azi_prev = $azi_int;		
+			%snr_list = {};
 			# redo; # repeat interation w/o calling "while (<INFILE>) "
 		}
 
