@@ -58,18 +58,46 @@ foreach $infile (@infiles) {
 			%snr_list = {};
 		}
 
-		if ($ele_prev == $ele_int and $azi_prev == $azi_int) {
-			# continue collecting data
-			$lines_agg ++;
+		unless ($ele_prev == $ele_int and $azi_prev == $azi_int) {
+			# writing aggregated data
+			foreach my $snr_ (sort keys %snr_list) {
+				# bookkeeping
+				$lines_out ++;
+				$lines_tot_out++;				
+				my $n = $snr_list{$snr_}->[0] ;
+				printf OUTFILE ("%f %f %d %d\n", 
+					$snr_list{$snr_}->[1] / $n ,
+					$snr_list{$snr_}->[2] / $n ,
+					$snr_, $n );
+				
+			} 
 
-		} else {
-			$lines_out ++;
-			$lines_tot_out++;
 
 			# force init sequence as in start
-			$ele_prev =  undef ; # $ele_int;
-			$azi_prev = undef ; # $azi_int;		
+			$ele_prev = $ele_int;
+			$azi_prev = $azi_int;		
+			# redo; # repeat interation w/o calling "while (<INFILE>) "
 		}
+
+
+
+		# if ($ele_prev == $ele_int and $azi_prev == $azi_int) {
+		{
+			# continue collecting data
+			$lines_agg ++;
+			unless (exists $snr_list{$snr}) {
+				# first occurance of this $snr in current azi/ele pairing
+				$snr_list{$snr} = (1, $ele_frac, $azi_frac);
+			} else {
+				# repeated occurence, collect statistics
+				$snr_list{$snr}->[0] ++;
+				$snr_list{$snr}->[1] += $ele_frac;
+				$snr_list{$snr}->[2] += $azi_frac;
+			}
+
+		} # else {
+
+
 
 
 
