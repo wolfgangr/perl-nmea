@@ -100,30 +100,41 @@ open (INFILE, $infile) || die ("cannot read from file $infile");
 		# printf ("x: %s | y: %s | z: %s \n", $x_wstp,  $y_wstp, $z_wstp) ;
 		# printf Dumper([$x_wstp,  $y_wstp, $z_wstp]) ;
 
+
 		# enforce cartesification, should be tested for performance effect...
-		$x_wstp->display_format('cartesian');
-		$y_wstp->display_format('cartesian');
-		$z_wstp->display_format('cartesian');
+		# $x_wstp->display_format('cartesian');
+		# $y_wstp->display_format('cartesian');
+		# $z_wstp->display_format('cartesian');
 
 		# printf ("x: %s | y: %s | z: %s \n", $x_wstp,  $y_wstp, $z_wstp) ;
 		# printf Dumper([$x_wstp,  $y_wstp, $z_wstp]) ;
+
+		# start of wavefront phase at bottom corner
+		my $x_phase = $x_wstp ** $x_range[0] +	
+			$y_wstp ** $y_range[0] + $z_wstp ** $z_range[0] ;
 
 
 		foreach my $ix (0..$#x_range) {
 			my $x = $x_range [$ix] ;
 
+			my $xy_phase = $x_phase;
 			foreach my $iy (0..$#y_range) {
 				my $y = $y_range [$iy] ;
 
+				my $xyz_phase = $xy_phase;
 				foreach my $iz (0..$#z_range) {
 					my $z = $z_range [$iz] ;
 					printf ("x: %s -> %s, y: %s -> %s z: %s -> %s\n",
 						$ix, $x, $iy, $y, $iz, $z);
 
-		# die ("#============~~~~~~~~~~~~~~~~---------- <- cutting edge\n");
-
+					# here it is going to happen:
+					$voxels[$x][$y][$z] += $xyz_phase * $amplitd;
+		die ("#============~~~~~~~~~~~~~~~~---------- <- cutting edge 0\n");
+					$xyz_phase *= $z_wstp;
 				} 
+				$xy_phase *= $y_wstp;
 			} 
+			$x_phase *= $x_wstp;
 		}
 		die ("#============~~~~~~~~~~~~~~~~---------- <- cutting edge I\n");
 	}
