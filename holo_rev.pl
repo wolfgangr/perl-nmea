@@ -152,11 +152,34 @@ my $outfile = sprintf ("%s.voxels", $pathbase);
 
 open (OUTFILE, ">".$outfile) || die ("cannot write to file $outfile");
 
-	foreach my $x  (@x_range) {
-	  foreach my $y  (@y_range) {
-	    foreach my $z  (@z_range) {
-		printf ("%d %d %d\n", $x, $y, $z);
-	} } }
+# foreach my $x  (@x_range) {
+#   foreach my $y  (@y_range) {
+#     foreach my $z  (@z_range) {
+
+  foreach my $ix (0..$#x_range) {
+    my $x = $x_range [$ix] ;
+
+    foreach my $iy (0..$#y_range) {
+      my $y = $y_range [$iy] ;
+
+      foreach my $iz (0..$#z_range) {
+        my $z = $z_range [$iz] ;
+
+	my $vxl = $voxels[$x][$y][$z];
+	# print Dumper($vxl);
+	my $out = sprintf ("%4d %4d %4d", $x , $y, $z);
+
+	$out .= sprintf (" %12f %12f %12f ",
+		($x_range[$ix]  - $x_ant) * $x_step ,
+		($y_range[$iy]  - $y_ant) * $y_step ,
+		($z_range[$iz]  - $z_ant) * $z_step   );
+
+	# printf OUTFILE ("%d %d %d\n", $x, $y, $z);
+	$out .= sprintf (" %12f %12f %12f %12f", Re($vxl), Im($vxl), arg($vxl), abs($vxl));
+	print $out, "\n";
+
+} } }
+
 close OUTFILE;
 
 
