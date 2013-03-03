@@ -131,21 +131,18 @@ open (INFILE, $infile) || die ("cannot read from file $infile");
 					# print Dumper($xyz_phase), "\n";
 					# print Dumper($amplitd), "\n";
 
-					$voxels[$x][$y][$z] += $xyz_phase * $amplitd;
-		# die ("#============~~~~~~~~~~~~~~~~---------- <- cutting edge 0\n");
+					$voxels[$ix][$iy][$iz] += $xyz_phase * $amplitd;
 					$xyz_phase *= $z_wstp;
 				} 
 				$xy_phase *= $y_wstp;
 			} 
 			$x_phase *= $x_wstp;
 		}
-		# die ("#============~~~~~~~~~~~~~~~~---------- <- cutting edge I\n");
 		print ".";
 	}
 close INFILE;
 
 print "\n";
-# die ("#============~~~~~~~~~~~~~~~~---------- <- cutting edge II\n");
 
 # =========================================
 
@@ -167,7 +164,7 @@ foreach my $ix (0..$#x_range) {
      foreach my $iz (0..$#z_range) {
         my $z = $z_range [$iz] ;
 
-	my $vxl = $voxels[$x][$y][$z];
+	my $vxl = $voxels[$ix][$iy][$iz];
 	# print Dumper($vxl);
 
 	# raw voxel indices
