@@ -58,7 +58,8 @@ foreach (@x_range) {
 	# my @x_plane = map[ cplx(0,0) x ($#y_range-1) ] , 0..($#z_range-1) ;
 	my @x_plane =();
 	foreach (@y_range) {
-		my @xy_line = map[ cplx(0,0) ] , 0..($#z_range) ;
+		# my @xy_line = map[ cplx(0,0) ] , 0..($#z_range) ;
+		my @xy_line = map  cplx(0,0) , ( 0..($#z_range)) ;
 		push @x_plane, \@xy_line;
 	}
 	push @voxels , \@x_plane;
@@ -79,7 +80,7 @@ open (INFILE, $infile) || die ("cannot read from file $infile");
 		unless ($#inlist == 3) { die ("format of $infile does not match"); }
 		# die ("cutting edge");
 		my ($ele, $azi, $snr, $repeats) = @inlist;
-		my $amplitd = $scale * $repeats * (10 ** (($snr - $dB1) / 10) ) ;
+		my $amplitd = cplx($scale * $repeats * (10 ** (($snr - $dB1) / 10) ),0) ;
 
 		my $ele_rad = $ele * pi / 180;
 		my $azi_rad = $azi * pi / 180;
@@ -124,19 +125,25 @@ open (INFILE, $infile) || die ("cannot read from file $infile");
 				my $xyz_phase = $xy_phase;
 				foreach my $iz (0..$#z_range) {
 					my $z = $z_range [$iz] ;
-					printf ("x: %s -> %s, y: %s -> %s z: %s -> %s\n",
-						$ix, $x, $iy, $y, $iz, $z);
+					# printf ("x: %s -> %s, y: %s -> %s z: %s -> %s\n",
+					#	$ix, $x, $iy, $y, $iz, $z);
 
-					# here it is going to happen:
+					# here it is supposed to happen:
+
+					# print Dumper($voxels[$x][$y][$z]), "\n";
+					# print Dumper($xyz_phase), "\n";
+					# print Dumper($amplitd), "\n";
+
 					$voxels[$x][$y][$z] += $xyz_phase * $amplitd;
-		die ("#============~~~~~~~~~~~~~~~~---------- <- cutting edge 0\n");
+		# die ("#============~~~~~~~~~~~~~~~~---------- <- cutting edge 0\n");
 					$xyz_phase *= $z_wstp;
 				} 
 				$xy_phase *= $y_wstp;
 			} 
 			$x_phase *= $x_wstp;
 		}
-		die ("#============~~~~~~~~~~~~~~~~---------- <- cutting edge I\n");
+		# die ("#============~~~~~~~~~~~~~~~~---------- <- cutting edge I\n");
+		print ".";
 	}
 close INFILE;
 
