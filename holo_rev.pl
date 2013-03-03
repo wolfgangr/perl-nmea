@@ -186,7 +186,8 @@ foreach my $ix (0..$#x_range) {
 	# printf OUTFILE ("%d %d %d\n", $x, $y, $z);
 	# raw complex voxel content in both notations
 	$out .= sprintf (" %12f %12f %12f %12f", Re($vxl), Im($vxl), arg($vxl), abs($vxl));
-	print $out, "\n";
+	# print $out, "\n";
+	print OUTFILE $out, "\n";
 
 } } }
 
