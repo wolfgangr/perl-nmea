@@ -34,10 +34,12 @@ $y_max = ($y_range[-1] - $y_ant) * $y_step;
 $z_min = ($z_range[0]  - $z_ant) * $z_step;
 $z_max = ($z_range[-1] - $z_ant) * $z_step;
 
+$num_voxels = ($#x_range + 1) * ($#y_range + 1) * ($#z_range +1) ;
+
 printf ("target interval  x:(%s..%s), y:(%s..%s), z:(%s..%s) m\n",
 	$x_min, $x_max, $y_min, $y_max, $z_min, $z_max );
 
-printf ("\tlambda = %f\n", $lambda);
+printf ("\tlambda = %f; number of voxels = %d\n", $lambda, $num_voxels);
 
 
 # initialize result space
@@ -156,25 +158,33 @@ open (OUTFILE, ">".$outfile) || die ("cannot write to file $outfile");
 #   foreach my $y  (@y_range) {
 #     foreach my $z  (@z_range) {
 
-  foreach my $ix (0..$#x_range) {
-    my $x = $x_range [$ix] ;
+foreach my $ix (0..$#x_range) {
+   my $x = $x_range [$ix] ;
 
-    foreach my $iy (0..$#y_range) {
-      my $y = $y_range [$iy] ;
+   foreach my $iy (0..$#y_range) {
+     my $y = $y_range [$iy] ;
 
-      foreach my $iz (0..$#z_range) {
+     foreach my $iz (0..$#z_range) {
         my $z = $z_range [$iz] ;
 
 	my $vxl = $voxels[$x][$y][$z];
 	# print Dumper($vxl);
+
+	# raw voxel indices
 	my $out = sprintf ("%4d %4d %4d", $x , $y, $z);
 
+	# renormed dBHz value
+	my $dB_out = $dB1 + 10 * log10 ( abs($vxl) / ($scale * $num_voxels) );
+	$out .= sprintf (" %12f", $dB_out);
+
+	# renormed voxel coords
 	$out .= sprintf (" %12f %12f %12f ",
 		($x_range[$ix]  - $x_ant) * $x_step ,
 		($y_range[$iy]  - $y_ant) * $y_step ,
 		($z_range[$iz]  - $z_ant) * $z_step   );
 
 	# printf OUTFILE ("%d %d %d\n", $x, $y, $z);
+	# raw complex voxel content in both notations
 	$out .= sprintf (" %12f %12f %12f %12f", Re($vxl), Im($vxl), arg($vxl), abs($vxl));
 	print $out, "\n";
 
