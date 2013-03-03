@@ -1,34 +1,28 @@
 #!/usr/bin/perl
 #
-# calculation of reverse holgoram using aggregated skyplot data as input
+# calculation of reverse hologram using aggregated skyplot data as input
+#
+# goal: proof of concept
+# for real performance, don't rely on OO high level language...
 #
 
 use Math::Complex; #':pi' ;	# hope this does'nt hurt performacne .... 
 use Data::Dumper;
 
+ $| = 1	;			# auto flush
+
 # use constant PI    => 4 * atan2(1, 1); # pi is defined in Math::Complex
 
-@x_range = (-10..10);		# +x -> North
-@y_range = (-10..10);		# +y -> East
-@z_range = (-5..5);		# +z -> up ... ?? or should we follow right hand rule??
+$conffile = $ARGV[0] or die ("usage: $0 <config file> <input file>");
+$infile = $ARGV[1] or die ("usage: $0 <config file> <input file>");
 
-$x_ant = 0;			# where antenna is located in above interval
-$y_ant = 0;
-$z_ant = 0;
-
-$x_step = 0.1;			# x interval per voxel in m
-$y_step = 0.1;
-$z_step = 0.1;
-
-$lambda = 3e8 / 1575e6 ;	# wave lenght 300000000/1575000000
-$dB1 = 30;			# dB value which is mapped to 1
-$scale = 0.001;		# rescaler to avoid numerical overflow etc
+do $conffile;	# load the config file as perl include code
 
 # ========== END OF CONFIG =======================
 
 
 
-$infile = $ARGV[0] or die ("usage: $0 input file");
+
 
 
 $x_min = ($x_range[0]  - $x_ant) * $x_step;
@@ -72,7 +66,7 @@ foreach (@x_range) {
 
 open (INFILE, $infile) || die ("cannot read from file $infile");
 	while (<INFILE>) {
-		print $_;
+		# print $_;
 		# eg 34.255548 100.524229 20 2
 		# elevation, azimuth, snr, repeats
 		@inlist = split ; #  ($_);
@@ -80,7 +74,8 @@ open (INFILE, $infile) || die ("cannot read from file $infile");
 		unless ($#inlist == 3) { die ("format of $infile does not match"); }
 		# die ("cutting edge");
 		my ($ele, $azi, $snr, $repeats) = @inlist;
-		my $amplitd = cplx($scale * $repeats * (10 ** (($snr - $dB1) / 10) ),0) ;
+		# my $amplitd = cplx($scale * $repeats * (10 ** (($snr - $dB1) / 10) ),0) ;
+		my $amplitd = $scale * $repeats * (10 ** (($snr - $dB1) / 10) ) ;
 
 		my $ele_rad = $ele * pi / 180;
 		my $azi_rad = $azi * pi / 180;
@@ -90,8 +85,8 @@ open (INFILE, $infile) || die ("cannot read from file $infile");
 		my $y_wcnt = ($y_step / $lambda) * cos($ele_rad) * sin($azi_rad);
 		my $z_wcnt = ($z_step / $lambda) * sin($ele_rad) ;
 
-		printf( "%s %s %s %s %s %s\n", $amplitd, $ele_rad,  $azi_rad ,
-			$x_wcnt, $y_wcnt, $z_wcnt ) ;
+		# printf( "%s %s %s %s %s %s\n", $amplitd, $ele_rad,  $azi_rad ,
+		#	$x_wcnt, $y_wcnt, $z_wcnt ) ;
 
 		# the complex wave step factors of size 1;
 		my $x_wstp = cplxe(1, pi * 2 * $x_wcnt);
@@ -103,9 +98,9 @@ open (INFILE, $infile) || die ("cannot read from file $infile");
 
 
 		# enforce cartesification, should be tested for performance effect...
-		# $x_wstp->display_format('cartesian');
-		# $y_wstp->display_format('cartesian');
-		# $z_wstp->display_format('cartesian');
+		$x_wstp->display_format('cartesian');
+		$y_wstp->display_format('cartesian');
+		$z_wstp->display_format('cartesian');
 
 		# printf ("x: %s | y: %s | z: %s \n", $x_wstp,  $y_wstp, $z_wstp) ;
 		# printf Dumper([$x_wstp,  $y_wstp, $z_wstp]) ;
@@ -147,7 +142,8 @@ open (INFILE, $infile) || die ("cannot read from file $infile");
 	}
 close INFILE;
 
-die ("#============~~~~~~~~~~~~~~~~---------- <- cutting edge II\n");
+print "\n";
+# die ("#============~~~~~~~~~~~~~~~~---------- <- cutting edge II\n");
 
 # =========================================
 
@@ -156,8 +152,11 @@ my $outfile = sprintf ("%s.voxels", $pathbase);
 
 open (OUTFILE, ">".$outfile) || die ("cannot write to file $outfile");
 
-
-
+	foreach my $x  (@x_range) {
+	  foreach my $y  (@y_range) {
+	    foreach my $z  (@z_range) {
+		printf ("%d %d %d\n", $x, $y, $z);
+	} } }
 close OUTFILE;
 
 
