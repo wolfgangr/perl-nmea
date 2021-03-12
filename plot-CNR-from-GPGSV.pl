@@ -479,7 +479,7 @@ $overall_varc_snr = ($ele_x_sv_sum2sq - ($ele_x_sv_sum * $ele_x_sv_sum / $ele_x_
 					($ele_x_sv_cnt-1) ;
 $overall_stdev_snr = sqrt($overall_varc_snr);
 
-printf ("overall mean: %f; variance: %f;  stddev: %f",
+printf ("overall mean: %f; variance: %f;  stddev: %f\n",
 	$overall_mean_snr, $overall_varc_snr, $overall_stdev_snr);
 
 
