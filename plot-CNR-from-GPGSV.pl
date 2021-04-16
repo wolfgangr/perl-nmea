@@ -3,10 +3,13 @@
 # read NMEA data,
 # see http://www.nmea.de/nmea0183datensaetze.html#gsv
 # extract Satellite view data
-# and plot div stuff 
+# and plot div stuff
+#
+# Will output data to $(basename $filename).output/whatever.stuff
+#
 # Wolfgang Rosner
 # wrosner@tirnet.de
-# provided "as is", don`pay me but don`t sue me...
+# provided "as is", don't pay me but don't sue me...
 ##
 # call like this:
 # ./plot-CNR-from-GPGSV.pl  log-2013-02-16-23-16.nmea
@@ -23,7 +26,7 @@ use Math::Spline;
 @svs =();	# count number of data for each sv
 
 
-# read input file name from cmd line 
+# read input file name from cmd line
 
 $infile = $ARGV[0] or die ("usage: $0 someinputfile.name");
 open INFILE , $infile or die ("cannot read from input file named $infile");
@@ -33,11 +36,12 @@ printf ("parsing input file %s\n",  $infile);
 # read input file
 while(<INFILE>) {
 	# print $_;
-	chomp ; chop ; #  looks like chomp removes NL but leaves CR 
+	s/\r[\n]*/\n/gm;  # now, an \r (Mac) or \r\n (Win) becomes \n (UNIX)
+	chomp;
 
 	# parse GSV lines
-	if( /\$GP(\w{3}),(.*)(\*..)$/  ) { 
-	
+	if( /\$G.(\w{3}),(.*)(\*..)$/  ) {
+
 		@fields = split (',' , $2);
 
 		if($1 eq 'RMC') {
@@ -61,7 +65,7 @@ while(<INFILE>) {
 
 			# append all data of current epoch and keep number of records
 			push (@data , @current) ;
-			$times{$timestamp} = @current ; 
+			$times{$timestamp} = @current ;
                         # print Dumper(@current);
 
 
@@ -69,7 +73,7 @@ while(<INFILE>) {
 		elsif ($1 eq 'GSV') {
                         ### print ("GSV-record: ");
 
-			# http://www.nmea.de/nmea0183datensaetze.html#gsv 
+			# http://www.nmea.de/nmea0183datensaetze.html#gsv
 			#  1) total number of messages
 			#  2) message number
 			#  3) satellites in view
@@ -85,14 +89,14 @@ while(<INFILE>) {
 
 			if ( $msg_num == 1 ) {
 				@current =() 	# start a new sequence
-			}	
-			
+			}
+
 			while ( @ fields) {
 				my $svn = shift @fields;
 				my $ele = shift @fields // -1;	# need Perl > 5.10 for // "defined or"
 				my $azi = shift @fields // -1;
 				my $snr = shift @fields // -1;
-				### printf ("sat no %i elevation %i azimuth %i SNR %i\n", $svn, $ele, $azi, $snr); 
+				### printf ("sat no %i elevation %i azimuth %i SNR %i\n", $svn, $ele, $azi, $snr);
 				push (@current, [0, $svn, $ele, $azi, $snr ] );
 			}
                         ### print ("\n");
@@ -122,7 +126,7 @@ print " ... rearranging data ... \n";
 # print Dumper([@svs]);
 # print "--------------------------------------\n";
 
-# create data structure for each satellite 
+# create data structure for each satellite
 foreach $SV (1 .. @svs) {
 	# print "SV number ", $SV, " ";
 	if ($hits = $svs[$SV]) {
@@ -162,7 +166,7 @@ print "inerpolating AZI and ELE...\n";
 
 foreach $SV (1 .. @svs) {
 	if (! ($hits = $svs[$SV])) { next ; }
-	
+
 	# arrays to collect support points
 	$sv_azi_st[$SV] = [];
 	$sv_azi_sa[$SV] = [];
@@ -213,7 +217,7 @@ foreach $SV (1 .. @svs) {
 	# print Dumper([@sv_azi_sa[$SV]]);
 	# print Dumper([@sv_ele_st[$SV]]);
 	# print Dumper([@sv_ele_se[$SV]]);
-	
+
 	my $spline_az = new Math::Spline(\@{$sv_azi_st[$SV]}, \@{$sv_azi_sa[$SV]});
 	my $spline_el = new Math::Spline(\@{$sv_ele_st[$SV]}, \@{$sv_ele_se[$SV]});
 
@@ -237,7 +241,7 @@ $gnuplot = "/usr/bin/gnuplot";
 printf("basename: >>%s<<, pathbase >>%s<<, infile: >>%s<<\n",   $basename , $pathbase , $infile);
 
 # create a dir named pathase, append sequential number if already exists
-$tempfile_dir = $pathbase;
+$tempfile_dir = "$pathbase.output";
 my $i = 0;
 while (-d $tempfile_dir) {
 	$i++;
@@ -303,8 +307,8 @@ set ylabel 'Elevation in deg'
 ENDOFCMDET
 
 # polar skyplot color coded
-$tempdata_sky  = $tempfile_body . '_sky.data';	
-$temppng_sky  = $tempfile_body . '_sky.png';		
+$tempdata_sky  = $tempfile_body . '_sky.data';
+$temppng_sky  = $tempfile_body . '_sky.png';
 
 open (SKYDATA, ">".$tempdata_sky) || error ("could not create temp data file $tempdata_sky");
 
@@ -321,21 +325,21 @@ foreach $SV (1 .. @svs) {
 	open (DATAFILE, ">".$tempdata_sv) || error ("could not create temp data file $tempdata_sv");
 
 	foreach $i (0..$#{$sv_time[$SV]}) {
-		printf DATAFILE ("%f %f %f %f %f %f\n", 
+		printf DATAFILE ("%f %f %f %f %f %f\n",
 			$sv_time[$SV][$i] ,
 			$sv_ele[$SV][$i] ,
 			$sv_azi[$SV][$i] ,
 			$sv_snr[$SV][$i] ,
 			$sv_ele_ip[$SV][$i] ,
-			$sv_azi_ip[$SV][$i] 
+			$sv_azi_ip[$SV][$i]
 		);
-		
+
 		# convert polar data for skyplot
 		printf 	SKYDATA ("%s %s %s\n",
 			# polar2xy ( angle, radius) ; angle in deg
 			# azimuth counts clockwise, elevation from zenith down
 			polar2xy(-$sv_azi[$SV][$i], 90 - $sv_ele[$SV][$i]),
-			$sv_snr[$SV][$i] 
+			$sv_snr[$SV][$i]
 		);
 	}
 
@@ -345,7 +349,7 @@ foreach $SV (1 .. @svs) {
 
 	printf ("creating chart for SV# %d....\n", $SV);
 
-	# create single plot for each SV	 
+	# create single plot for each SV
 	$command= <<ENDOFCOMMAND;
 # plot for SV # $SV
 set term png
@@ -366,7 +370,7 @@ ENDOFCOMMAND
 
 	# add entry for multi SV animated gif
 	$command_anim .= "plot \"$tempdata_sv\" using 2:4 with points lt $SV\n";
-	
+
 	# add entry for elevation  over time
 	$command_et .= "plot \"$tempdata_sv\" using 1:2 with lines lt $SV\n";
 	$command_et .= "plot \"$tempdata_sv\" using 1:5 with lines lt $SV\n";
@@ -409,7 +413,7 @@ print "collecting statistical values\n";
 # we might initialize arrays like
 #	@foo = map {[ (0) x $x ]} 1 .. $y
 
-@sv_ele_V_cnt = map {[ (0) x 90 ]} (1 .. @svs) ; 
+@sv_ele_V_cnt = map {[ (0) x 90 ]} (1 .. @svs) ;
 @sv_ele_V_sum = map {[ (0) x 90 ]} (1 .. @svs) ;
 @sv_ele_V_sum2sq = map {[ (0) x 90 ]} (1 .. @svs) ;
 
@@ -420,7 +424,7 @@ foreach $dp(@data) {
 	my $snr = $dp->[4];
 
 	unless ( $snr > 0 ) {	next ; } 	# exclude 0 and -1 SNR values
-	
+
 	$sv_ele_V_cnt[$svn][$ele] ++ ;		# count occurances
 	$sv_ele_V_sum[$svn][$ele] += $snr ;		# sum
 	$sv_ele_V_sum2sq[$svn][$ele] += $snr * $snr ;	# sum of squares
@@ -474,7 +478,7 @@ $overall_varc_snr = ($ele_x_sv_sum2sq - ($ele_x_sv_sum * $ele_x_sv_sum / $ele_x_
 					($ele_x_sv_cnt-1) ;
 $overall_stdev_snr = sqrt($overall_varc_snr);
 
-printf ("overall mean: %f; variance: %f;  stddev: %f", 
+printf ("overall mean: %f; variance: %f;  stddev: %f\n",
 	$overall_mean_snr, $overall_varc_snr, $overall_stdev_snr);
 
 
@@ -482,7 +486,7 @@ printf ("overall mean: %f; variance: %f;  stddev: %f",
 
 # standard dev over all satellites per elevation
 $tempdata_sdev = $tempfile_body . '_sdev.data';
-$temppng_sdev = $tempfile_body . '_sdev.png'; 
+$temppng_sdev = $tempfile_body . '_sdev.png';
 
 open (SDEVDATA, ">".$tempdata_sdev) || error ("could not create temp data file $tempdata_sdev");
 
@@ -519,7 +523,7 @@ gnuplotcmd($command_sdev);
 
 
 # standard dev over elevation for each sv
- 
+
 foreach $sv(1 .. @svs) {
 	unless ($sv_cnt_sum[$sv] > 1) { next ; }
 
@@ -535,7 +539,7 @@ foreach $sv(1 .. @svs) {
 
 	printf ("   ... writing data ... \n");
 
-	open (SVSDEVDATA, ">".$tempdata_sv_sdev) || 
+	open (SVSDEVDATA, ">".$tempdata_sv_sdev) ||
 			error ("could not create temp data file $tempdata_sv_sdev");
 
 	foreach $ele (1 .. 90 ) {
@@ -567,7 +571,7 @@ plot "$tempdata_sv_sdev" using 1:2:4 w yerrorbars lt $sv
 ENDOFCMDSVSDEV
 
 	gnuplotcmd($command_sv_sdev);
-	
+
 }
 
 
@@ -586,11 +590,11 @@ sub gnuplotcmd {
 	open CMDLOG, ">>", "$tempcmd" || error ("cannot open $tempcmd")   ;
 	print CMDLOG $cmd;
 	print CMDLOG "\n";
-	close CMDLOG ; 
+	close CMDLOG ;
 
 	open GNUPLOT, "| $gnuplot > $templog 2>&1" || error ("cannot open gnuplot")   ;
 	print GNUPLOT $cmd    || error ("cannot send data to gnuplot") ;
-	close GNUPLOT ;   
+	close GNUPLOT ;
 
 }
 
