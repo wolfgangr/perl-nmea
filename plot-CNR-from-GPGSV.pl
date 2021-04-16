@@ -5,8 +5,7 @@
 # extract Satellite view data
 # and plot div stuff
 #
-# Will use inputfile basename to create a dir of results,
-# so input file must have an extension
+# Will output data to $(basename $filename).output/whatever.stuff
 #
 # Wolfgang Rosner
 # wrosner@tirnet.de
@@ -242,7 +241,7 @@ $gnuplot = "/usr/bin/gnuplot";
 printf("basename: >>%s<<, pathbase >>%s<<, infile: >>%s<<\n",   $basename , $pathbase , $infile);
 
 # create a dir named pathase, append sequential number if already exists
-$tempfile_dir = $pathbase;
+$tempfile_dir = "$pathbase.output";
 my $i = 0;
 while (-d $tempfile_dir) {
 	$i++;
