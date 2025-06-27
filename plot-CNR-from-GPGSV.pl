@@ -249,7 +249,7 @@ foreach my $SV (1 .. @svs) {
 
 print "====== calling gnuplot =========\n";
 
-$gnuplot = "/usr/bin/gnuplot";
+my $gnuplot = "/usr/bin/gnuplot";
 
 #### build temporary folder and file name structure
 # separate path/basename.extension
@@ -259,7 +259,7 @@ $gnuplot = "/usr/bin/gnuplot";
 printf("basename: >>%s<<, pathbase >>%s<<, infile: >>%s<<\n",   $basename , $pathbase , $infile);
 
 # create a dir named pathase, append sequential number if already exists
-$tempfile_dir = $pathbase;
+my $tempfile_dir = $pathbase;
 my $i = 0;
 while (-d $tempfile_dir) {
 	$i++;
@@ -268,23 +268,23 @@ while (-d $tempfile_dir) {
 
 mkdir $tempfile_dir;
 
-$tempfile_prefix = sprintf("%s/%s", $tempfile_dir, $basename);
+my $tempfile_prefix = sprintf("%s/%s", $tempfile_dir, $basename);
 printf("dir: %s ; prefix: %s\n", $tempfile_dir , $tempfile_prefix);
 
 # $tempfile_body = $tempfile_prefix . $time_suffix;
-$tempfile_body = $tempfile_prefix;
+my $tempfile_body = $tempfile_prefix;
 
 
-$templog  = $tempfile_body . '.log';
-$tempcmd  = $tempfile_body . '.gnu';
+my $templog  = $tempfile_body . '.log';
+my $tempcmd  = $tempfile_body . '.gnu';
 
 # for combined data output .. still to do
-$temppng_all  = $tempfile_body . '_all.png';		# rectangle plot of all sats
+my $temppng_all  = $tempfile_body . '_all.png';		# rectangle plot of all sats
 # $temppng_sky  = $tempfile_body . '_sky.png';		# polar skyplot color coded
 # $tempdata_all = $tempfile_body . '_all.data';
 
 # header for all SV on top of each other
-$command_all = <<ENDOFCMDALL;
+my $command_all = <<ENDOFCMDALL;
 #  all SNR over elev scatter on top of each other
 set term png
 set output "$temppng_all"
@@ -296,9 +296,9 @@ set multiplot
 ENDOFCMDALL
 
 # animated GIF with all SV in sequence
-$tempgif_anim  = $tempfile_body . '_anim.gif';
+my $tempgif_anim  = $tempfile_body . '_anim.gif';
 
-$command_anim = <<ENDOFCMDANIM;
+my $command_anim = <<ENDOFCMDANIM;
 # animated gif for all SNR over elev scatter
 set term  gif animate opt delay 100
 set output "$tempgif_anim"
@@ -309,9 +309,9 @@ set ylabel 'CNR in dbHz'
 ENDOFCMDANIM
 
 # elevation by time
-$temppng_et = $tempfile_body . '_et.png';
+my $temppng_et = $tempfile_body . '_et.png';
 
-$command_et = <<ENDOFCMDET;
+my $command_et = <<ENDOFCMDET;
 # elevation over time by SV
 set term png
 set output "$temppng_et"
@@ -325,24 +325,25 @@ set ylabel 'Elevation in deg'
 ENDOFCMDET
 
 # polar skyplot color coded
-$tempdata_sky  = $tempfile_body . '_sky.data';	
-$temppng_sky  = $tempfile_body . '_sky.png';		
+my $tempdata_sky  = $tempfile_body . '_sky.data';	
+my $temppng_sky  = $tempfile_body . '_sky.png';		
 
 open (SKYDATA, ">".$tempdata_sky) || error ("could not create temp data file $tempdata_sky");
 
 
-foreach $SV (1 .. @svs) {
-	if (! ($hits = $svs[$SV])) { next ; }
+foreach my $SV (1 .. @svs) {
+        my $hits;
+	if (! ( $hits = $svs[$SV])) { next ; }
 
 
-	$temppng_sv  = sprintf ("%s_%03d.png", $tempfile_body , $SV);
-	$tempdata_sv = sprintf ("%s_%03d.data", $tempfile_body , $SV);
+	my $temppng_sv  = sprintf ("%s_%03d.png", $tempfile_body , $SV);
+	my $tempdata_sv = sprintf ("%s_%03d.data", $tempfile_body , $SV);
 
 	printf ("writing data for SV# %d with %d data points ... ", $SV, $hits);
 
 	open (DATAFILE, ">".$tempdata_sv) || error ("could not create temp data file $tempdata_sv");
 
-	foreach $i (0..$#{$sv_time[$SV]}) {
+	foreach my $i (0..$#{$sv_time[$SV]}) {
 		printf DATAFILE ("%f %f %f %f %f %f\n", 
 			$sv_time[$SV][$i] ,
 			$sv_ele[$SV][$i] ,
@@ -368,7 +369,7 @@ foreach $SV (1 .. @svs) {
 	printf ("creating chart for SV# %d....\n", $SV);
 
 	# create single plot for each SV	 
-	$command= <<ENDOFCOMMAND;
+	my $command= <<ENDOFCOMMAND;
 # plot for SV # $SV
 set term png
 set output "$temppng_sv"
@@ -397,7 +398,7 @@ ENDOFCOMMAND
 close SKYDATA;
 
 print "rendering skyplot\n";
-$command_sky = <<ENDOFCMDSKY;
+my $command_sky = <<ENDOFCMDSKY;
 # skyplot of SNR vs polar elevation/azimuth
 set term png
 set output "$temppng_sky"
@@ -431,12 +432,12 @@ print "collecting statistical values\n";
 # we might initialize arrays like
 #	@foo = map {[ (0) x $x ]} 1 .. $y
 
-@sv_ele_V_cnt = map {[ (0) x 90 ]} (1 .. @svs) ; 
-@sv_ele_V_sum = map {[ (0) x 90 ]} (1 .. @svs) ;
-@sv_ele_V_sum2sq = map {[ (0) x 90 ]} (1 .. @svs) ;
+my @sv_ele_V_cnt = map {[ (0) x 90 ]} (1 .. @svs) ; 
+my @sv_ele_V_sum = map {[ (0) x 90 ]} (1 .. @svs) ;
+my @sv_ele_V_sum2sq = map {[ (0) x 90 ]} (1 .. @svs) ;
 
 # collect each sv  x elev-1-deg interval
-foreach $dp(@data) {
+foreach my $dp(@data) {
 	my $svn = $dp->[1];
 	my $ele = $dp->[2];
 	my $snr = $dp->[4];
@@ -448,10 +449,22 @@ foreach $dp(@data) {
 	$sv_ele_V_sum2sq[$svn][$ele] += $snr * $snr ;	# sum of squares
 }
 
+
+my @sv_cnt =();
+my @sv_cnt_sum =();
+my @sv_sum_sum =();
+my @sv_sum2sq_sum =();
+
+my $svs_cnt;
+my $sv_x_ele_cls;
+my $sv_x_ele_cnt;
+my $sv_x_ele_sum;
+my $sv_x_ele_sum2sq;
+
 # aggregates over satellites
-foreach $sv(1 .. @svs) {
-	unless (($hits = $svs[$sv])) { next ; }
-	foreach $ele (0 .. 90 ) {
+foreach my $sv(1 .. @svs) {
+	unless ((my $hits = $svs[$sv])) { next ; }
+	foreach my $ele (0 .. 90 ) {
 		unless ( $sv_ele_V_cnt[$sv][$ele] ) { next ; }
 		$sv_cnt[$sv] ++;	# number of elev intervals in track
 		$sv_cnt_sum[$sv] += $sv_ele_V_cnt[$sv][$ele];
@@ -465,10 +478,23 @@ foreach $sv(1 .. @svs) {
 	$sv_x_ele_sum2sq += $sv_sum2sq_sum[$sv];
 }
 
+
+my @ele_cnt =();
+my @ele_cnt_sum =();
+my @ele_sum_sum =();
+my @ele_sum2sq_sum =();
+
+my $elevs_cnt;
+my $ele_x_sv_cls;
+my $ele_x_sv_cnt;
+my $ele_x_sv_sum;
+my $ele_x_sv_sum2sq;
+
+
 # aggregates over elev intervals
-foreach $ele (0 .. 90 ) {
+foreach my $ele (0 .. 90 ) {
 	# no obvious skip condition?
-	foreach $sv(1 .. @svs) {
+	foreach my $sv(1 .. @svs) {
 		# if (! ($hits = $svs[$sv])) { next ; }
 		unless ( $sv_ele_V_cnt[$sv][$ele] ) { next ; }
 
@@ -491,10 +517,10 @@ printf ("SVs: %d, classes: %d, samples %d, sum %d , sum-square: %d\n",
 printf ("ele: %d, classes: %d, samples %d, sum %d , sum-square: %d\n",
 	$elevs_cnt, $ele_x_sv_cls, $ele_x_sv_cnt, $ele_x_sv_sum, $ele_x_sv_sum2sq );
 
-$overall_mean_snr = $ele_x_sv_sum / $ele_x_sv_cnt;
-$overall_varc_snr = ($ele_x_sv_sum2sq - ($ele_x_sv_sum * $ele_x_sv_sum / $ele_x_sv_cnt))  /
+my $overall_mean_snr = $ele_x_sv_sum / $ele_x_sv_cnt;
+my $overall_varc_snr = ($ele_x_sv_sum2sq - ($ele_x_sv_sum * $ele_x_sv_sum / $ele_x_sv_cnt))  /
 					($ele_x_sv_cnt-1) ;
-$overall_stdev_snr = sqrt($overall_varc_snr);
+my $overall_stdev_snr = sqrt($overall_varc_snr);
 
 printf ("overall mean: %f; variance: %f;  stddev: %f", 
 	$overall_mean_snr, $overall_varc_snr, $overall_stdev_snr);
@@ -503,12 +529,18 @@ printf ("overall mean: %f; variance: %f;  stddev: %f",
 # ----------------  calculating and writing plottables
 
 # standard dev over all satellites per elevation
-$tempdata_sdev = $tempfile_body . '_sdev.data';
-$temppng_sdev = $tempfile_body . '_sdev.png'; 
+my $tempdata_sdev = $tempfile_body . '_sdev.data';
+my $temppng_sdev = $tempfile_body . '_sdev.png'; 
 
 open (SDEVDATA, ">".$tempdata_sdev) || error ("could not create temp data file $tempdata_sdev");
 
-foreach $ele (1 .. 90 ) {
+my @ele_mean = ();
+my @ele_varc = ();
+my @ele_stdev = ();
+
+
+
+foreach my $ele (1 .. 90 ) {
 	unless ($ele_cnt_sum[$ele] > 1) { next ; }
 
 	$ele_mean[$ele] = $ele_sum_sum[$ele] / $ele_cnt_sum[$ele] ;
@@ -523,7 +555,7 @@ foreach $ele (1 .. 90 ) {
 close SDEVDATA;
 
 
-$command_sdev = <<ENDOFCMDSDEV;
+my $command_sdev = <<ENDOFCMDSDEV;
 # plot standard dev over all satellites per elevation
 set term png
 set output "$temppng_sdev"
@@ -542,7 +574,16 @@ gnuplotcmd($command_sdev);
 
 # standard dev over elevation for each sv
  
-foreach $sv(1 .. @svs) {
+my @sv_mean_snr = ();
+my @sv_varc_snr = ();
+my @sv_stdev_snr = ();
+
+my @sv_ele_mean = ();
+my @sv_ele_varc = ();
+my @sv_ele_stdev = ();
+
+
+foreach my $sv(1 .. @svs) {
 	unless ($sv_cnt_sum[$sv] > 1) { next ; }
 
 	$sv_mean_snr[$sv] = $sv_sum_sum[$sv] / $sv_cnt_sum[$sv] ;
@@ -552,15 +593,15 @@ foreach $sv(1 .. @svs) {
 	printf ("statiscs for SV ' %3d: mean: %9f; variance: %9f; stddev: %9f",
 		$sv, $sv_mean_snr[$sv], $sv_varc_snr[$sv] , $sv_stdev_snr[$sv]);
 
-	$temppng_sv_sdev = sprintf ("%s_sdev_%03d.png", $tempfile_body , $sv);
-	$tempdata_sv_sdev = sprintf ("%s_sdev_%03d.data", $tempfile_body , $sv);
+	my $temppng_sv_sdev = sprintf ("%s_sdev_%03d.png", $tempfile_body , $sv);
+	my $tempdata_sv_sdev = sprintf ("%s_sdev_%03d.data", $tempfile_body , $sv);
 
 	printf ("   ... writing data ... \n");
 
 	open (SVSDEVDATA, ">".$tempdata_sv_sdev) || 
 			error ("could not create temp data file $tempdata_sv_sdev");
 
-	foreach $ele (1 .. 90 ) {
+	foreach my $ele (1 .. 90 ) {
 		unless ($sv_ele_V_cnt[$sv][$ele] > 1) { next ; }
 
 		$sv_ele_mean[$sv][$ele] = $sv_ele_V_sum[$sv][$ele] / $sv_ele_V_cnt[$sv][$ele] ;
@@ -575,7 +616,7 @@ foreach $sv(1 .. @svs) {
 
 	close SVSDEVDATA;
 
-	$command_sv_sdev = <<ENDOFCMDSVSDEV;
+	my $command_sv_sdev = <<ENDOFCMDSVSDEV;
 # plot standard dev over all satellites per elevation
 set term png
 set output "$temppng_sv_sdev"
