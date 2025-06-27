@@ -36,11 +36,11 @@ while(<INFILE>) {
 	chomp ; chop ; #  looks like chomp removes NL but leaves CR 
 
 	# parse GSV lines
-	if( /\$GP(\w{3}),(.*)(\*..)$/  ) { 
+	if( /^\$G([NPLBA])(\w{3}),(.*)(\*..)$/  ) { 
 	
-		@fields = split (',' , $2);
+		@fields = split (',' , $3);
 
-		if($1 eq 'RMC') {
+		if($2 eq 'RMC') {
 			### print ("RMC-record: ");
                         my $hh = substr($fields[0], 0, 2);
                         my $mm = substr($fields[0], 2, 2);
@@ -66,7 +66,7 @@ while(<INFILE>) {
 
 
 		}
-		elsif ($1 eq 'GSV') {
+		elsif ($2 eq 'GSV') {
                         ### print ("GSV-record: ");
 
 			# http://www.nmea.de/nmea0183datensaetze.html#gsv 
