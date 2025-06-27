@@ -41,7 +41,7 @@ while(<INFILE>) {
 		@fields = split (',' , $3);
 
 		if($2 eq 'RMC') {
-			### print ("RMC-record: ");
+			print ("RMC-record: ");
                         my $hh = substr($fields[0], 0, 2);
                         my $mm = substr($fields[0], 2, 2);
                         my $ss = substr($fields[0], 4, 2);
@@ -67,7 +67,7 @@ while(<INFILE>) {
 
 		}
 		elsif ($2 eq 'GSV') {
-                        ### print ("GSV-record: ");
+                        # print ("GSV-record: ");
 
 			# http://www.nmea.de/nmea0183datensaetze.html#gsv 
 			#  1) total number of messages
@@ -115,12 +115,12 @@ close INFILE;
 print "======================== read complete =======================\n";
 print " ... rearranging data ... \n";
 
-# print Dumper([@data]);
-# print "--------------------------------------\n";
-# print Dumper([%times]);
-# print "--------------------------------------\n";
-# print Dumper([@svs]);
-# print "--------------------------------------\n";
+print Dumper([@data]);
+print "--------------------------------------\n";
+print Dumper([%times]);
+print "--------------------------------------\n";
+print Dumper([@svs]);
+print "--------------------------------------\n";
 
 # create data structure for each satellite 
 foreach $SV (1 .. @svs) {
