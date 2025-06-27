@@ -44,20 +44,21 @@ while(<INFILE>) {
 		my @fields = split (',' , $3);
 		my @current;
 
-		if($2 eq 'RMC') {
-			print ("RMC-record: ");
-                        my $hh = substr($fields[0], 0, 2);
-                        my $mm = substr($fields[0], 2, 2);
-                        my $ss = substr($fields[0], 4, 2);
-			my $ms = ( ( "0" . substr($fields[0], 6) ) * 1000);
+		# if($2 eq 'RMC') {
+		#	print ("RMC-record: ");
+                #        my $hh = substr($fields[0], 0, 2);
+		#        my $mm = substr($fields[0], 2, 2);
+                #        my $ss = substr($fields[0], 4, 2);
+		#  	 my $ms = ( ( "0" . substr($fields[0], 6) ) * 1000);
+                #        my $dd = substr($fields[8], 0, 2);
+		#        my $MM = substr($fields[8], 2, 2);
+                #        my $yy = substr($fields[8], 4, 2) + 2000 ;
 
-                        my $dd = substr($fields[8], 0, 2);
-                        my $MM = substr($fields[8], 2, 2);
-                        my $yy = substr($fields[8], 4, 2) + 2000 ;
+		#	my $timestamp = timegm_nocheck($ss,$mm,$hh,$dd,$MM-1,$yy);
 
-			my $timestamp = timegm_nocheck($ss,$mm,$hh,$dd,$MM-1,$yy);
-
+		if($2 eq 'GGA') {
                         # insert timestamp into all SV collected
+			my $timestamp = $fields[0] ;
                         foreach my $svc (@current) {
                                 $svc->[0] = $timestamp;
 				$svs[ $svc->[1] ] ++; 	# count data per satellite
