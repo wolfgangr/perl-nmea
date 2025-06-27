@@ -12,20 +12,23 @@
 # ./plot-CNR-from-GPGSV.pl  log-2013-02-16-23-16.nmea
 
 
+use warnings;
+use strict;
+
 use Time::Local 'timegm_nocheck' ;	# tiny but what I need
 use Data::Dumper ;
 # use Math::Interpolate qw(linear_interpolate robust_interpolate);
 use Math::Spline;
 
 # in a data base, this might be tables
-@data =();	# collection of pointers to all sv x time data
-%times =(); 	# pointer to arrays of all data for each time
-@svs =();	# count number of data for each sv
+my @data =();	# collection of pointers to all sv x time data
+my %times =(); 	# pointer to arrays of all data for each time
+my @svs =();	# count number of data for each sv
 
 
 # read input file name from cmd line 
 
-$infile = $ARGV[0] or die ("usage: $0 someinputfile.name");
+my $infile = $ARGV[0] or die ("usage: $0 someinputfile.name");
 open INFILE , $infile or die ("cannot read from input file named $infile");
 
 printf ("parsing input file %s\n",  $infile);
@@ -36,9 +39,10 @@ while(<INFILE>) {
 	chomp ; chop ; #  looks like chomp removes NL but leaves CR 
 
 	# parse GSV lines
-	if( /^\$G([NPLBA])(\w{3}),(.*)(\*..)$/  ) { 
+	if( /^\$G([NPLBAQ])(\w{3}),(.*)(\*..)$/  ) { 
 	
-		@fields = split (',' , $3);
+		my @fields = split (',' , $3);
+		my @current;
 
 		if($2 eq 'RMC') {
 			print ("RMC-record: ");
@@ -51,10 +55,10 @@ while(<INFILE>) {
                         my $MM = substr($fields[8], 2, 2);
                         my $yy = substr($fields[8], 4, 2) + 2000 ;
 
-			$timestamp = timegm_nocheck($ss,$mm,$hh,$dd,$MM-1,$yy);
+			my $timestamp = timegm_nocheck($ss,$mm,$hh,$dd,$MM-1,$yy);
 
                         # insert timestamp into all SV collected
-                        foreach $svc (@current) {
+                        foreach my $svc (@current) {
                                 $svc->[0] = $timestamp;
 				$svs[ $svc->[1] ] ++; 	# count data per satellite
                         }
@@ -123,10 +127,18 @@ print Dumper([@svs]);
 print "--------------------------------------\n";
 
 # create data structure for each satellite 
-foreach $SV (1 .. @svs) {
+
+my @sv_time = ();
+my @sv_ele = ();
+my @sv_azi = ();
+my @sv_snr = ();
+
+
+
+foreach my $SV (1 .. @svs) {
 	# print "SV number ", $SV, " ";
-	if ($hits = $svs[$SV]) {
-		# print "datapoints: " , $hits;
+	if (my $hits = $svs[$SV]) {
+		print "datapoints: " , $hits;
 	}
 	# print "\n";
         $sv_time[$SV] = [];
@@ -140,7 +152,7 @@ foreach $SV (1 .. @svs) {
 
 # print Dumper([@sv_time]);
 
-foreach $datapoint(@data) {
+foreach my $datapoint(@data) {
   my $svn = $datapoint->[1];
   # print "svn: ", $svn , " Datapoint: ", join ("|", @$datapoint) , "\n" ;
   push @{$sv_time[$svn]}, ($datapoint->[0]);
@@ -160,8 +172,18 @@ foreach $datapoint(@data) {
 # interpolate AZI and ELE between integer jumps
 print "inerpolating AZI and ELE...\n";
 
-foreach $SV (1 .. @svs) {
-	if (! ($hits = $svs[$SV])) { next ; }
+
+my @sv_azi_st = ();
+my @sv_azi_sa = ();
+my @sv_azi_ip = ();
+
+my @sv_ele_st = ();
+my @sv_ele_se = ();
+my @sv_ele_ip = ();
+
+
+foreach my $SV (1 .. @svs) {
+	if (! (my $hits = $svs[$SV])) { next ; }
 	
 	# arrays to collect support points
 	$sv_azi_st[$SV] = [];
@@ -178,7 +200,7 @@ foreach $SV (1 .. @svs) {
 	my $last_ee = $sv_ele[$SV][0];
 
 	# search support point at jumps of azi / ele values
-	foreach $i (1..$#{$sv_time[$SV]}) {
+	foreach my $i (1..$#{$sv_time[$SV]}) {
 		if ($last_aa != $sv_azi[$SV][$i]) {
 			# azi step found
 			push @{$sv_azi_st[$SV]}, ( 0.5 * ($sv_time[$SV][$i-1] + $sv_time[$SV][$i])) ;
@@ -217,7 +239,7 @@ foreach $SV (1 .. @svs) {
 	my $spline_az = new Math::Spline(\@{$sv_azi_st[$SV]}, \@{$sv_azi_sa[$SV]});
 	my $spline_el = new Math::Spline(\@{$sv_ele_st[$SV]}, \@{$sv_ele_se[$SV]});
 
-	foreach $i (1..$#{$sv_time[$SV]}) {
+	foreach my $i (1..$#{$sv_time[$SV]}) {
 		$sv_azi_ip[$SV][$i] = $spline_az->evaluate($sv_time[$SV][$i]);
 		$sv_ele_ip[$SV][$i] = $spline_el->evaluate($sv_time[$SV][$i]);
 	}
