@@ -92,9 +92,9 @@ while(<INFILE>) {
 			#  more satellite infos like 4)-7)
 
 			print $1;
-			print $fields[-1] ;
+			# print $fields[-1] ;
 			next unless ($1 eq 'P');    	# crude test hack: only GPS
-			# next unless ($fields[-1] == 1); 	# crude test hack: only L1 band
+			# next unless ($fields[-1] eq '1'); 	# crude NMEA 4.? hack: only L1 band
 			
 			print ("GPGSV-L1 record: ");
 
@@ -102,6 +102,10 @@ while(<INFILE>) {
 			my $msg_tot = shift @fields;
 			my $msg_num = shift @fields;
 			my $sat_inV = shift @fields;
+
+			my $sys_id = pop @fields;
+			print $sys_id;
+			next unless ($sys_id eq '1');
 
 			if ( $msg_num == 1 ) {
 				@current =(); 	# start a new sequence
@@ -136,7 +140,11 @@ close INFILE;
 # debug print: show what we have now:
 print "======================== read complete =======================\n";
 print " ... rearranging data ... \n";
-if (0) {
+
+
+if (1) {  # debug block
+exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+
 print "---\@data-----------------------------------\n";
 print Dumper([@data]);
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
