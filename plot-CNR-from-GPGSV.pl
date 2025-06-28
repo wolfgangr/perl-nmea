@@ -71,7 +71,7 @@ while(<INFILE>) {
 			} ;
 
                         foreach my $svc (@current) {
-                                $svc->[0] = $timestamp;
+                                # $svc->[0] = $timestamp;
 				$svs[ $svc->[1] ] ++; 	# count data per satellite
                         }
 
@@ -123,7 +123,7 @@ while(<INFILE>) {
 				my $azi = shift @fields // -1;
 				my $snr = shift @fields // -1;
 				### printf ("sat no %i elevation %i azimuth %i SNR %i\n", $svn, $ele, $azi, $snr); 
-				push (@current, [0, $svn, $ele, $azi, $snr ] );
+				push (@current, [$timestamp, $svn, $ele, $azi, $snr ] );
 				print $#current, '~';
 			}
                         ### print ("\n");
@@ -153,19 +153,19 @@ if (1) {  # debug block
 $Data::Dumper::Sortkeys = 1;
 print "---\%GGA_raw-----------------------------------\n";
 print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
-exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+# exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\@data-----------------------------------\n";
-print Dumper([@data]);
+print Data::Dumper->Dump([\@data] , [qw(\@data)]  );
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%times-----------------------------------\n";
-print Dumper([%times]);
+print Data::Dumper->Dump([\%times], [qw(\%times)] );
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 
 print "---\@svs-----------------------------------\n";
-print Dumper([@svs]);
+print Data::Dumper->Dump([\@svs], [qw(\@svs)] );
 print "--------------------------------------\n";
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 }
