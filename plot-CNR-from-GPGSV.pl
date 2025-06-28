@@ -25,6 +25,8 @@ my @data =();	# collection of pointers to all sv x time data
 my %times =(); 	# pointer to arrays of all data for each time
 my @svs =();	# count number of data for each sv
 
+my %SVS_raw = ();   # keep SV sys and sig IDs
+my %GGA_raw = ();   # keep GGA data
 
 # read input file name from cmd line 
 
@@ -47,24 +49,27 @@ while(<INFILE>) {
 	if( /^\$G([NPLBAQ])(\w{3}),(.*)(\*..)$/  ) { 
 	
 		my @fields = split (',' , $3);
-		# my @current;
-
-		# if($2 eq 'RMC') {
-		#	print ("RMC-record: ");
-                #        my $hh = substr($fields[0], 0, 2);
-		#        my $mm = substr($fields[0], 2, 2);
-                #        my $ss = substr($fields[0], 4, 2);
-		#  	 my $ms = ( ( "0" . substr($fields[0], 6) ) * 1000);
-                #        my $dd = substr($fields[8], 0, 2);
-		#        my $MM = substr($fields[8], 2, 2);
-                #        my $yy = substr($fields[8], 4, 2) + 2000 ;
-
-		#	my $timestamp = timegm_nocheck($ss,$mm,$hh,$dd,$MM-1,$yy);
 
 		if($2 eq 'GGA') {
                         # insert timestamp into all SV collected
 			$timestamp = $fields[0] ;
 			print "\nat $timestamp - ";
+
+			# Table 7-4 GGA Data Structure
+			#	( N4 Products Commands and Logs Reference Book )
+
+			$GGA_raw{$timestamp} = {
+				timestamp => $timestamp,
+				lat 		=> $fields[1],
+				lat_dir		=> $fields[2],
+                                lon		=> $fields[3],
+                                lon_dir		=> $fields[4],
+                                q_fix 		=> $fields[5],
+                                n_sats		=> $fields[6],
+                                hdop		=> $fields[7],
+				age		=> $fields[12],
+			} ;
+
                         foreach my $svc (@current) {
                                 $svc->[0] = $timestamp;
 				$svs[ $svc->[1] ] ++; 	# count data per satellite
@@ -143,6 +148,11 @@ print " ... rearranging data ... \n";
 
 
 if (1) {  # debug block
+# exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+
+$Data::Dumper::Sortkeys = 1;
+print "---\%GGA_raw-----------------------------------\n";
+print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\@data-----------------------------------\n";
