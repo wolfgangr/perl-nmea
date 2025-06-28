@@ -59,7 +59,8 @@ while(<INFILE>) {
 			# Table 7-4 GGA Data Structure
 			#	( N4 Products Commands and Logs Reference Book )
 
-			$GGA_raw{$timestamp} = {
+			# $GGA_raw{$timestamp} = {
+			my %cga = (
 				timestamp => $timestamp,
 				lat 		=> $fields[1],
 				lat_dir		=> $fields[2],
@@ -68,8 +69,11 @@ while(<INFILE>) {
                                 q_fix 		=> $fields[5],
                                 n_sats		=> $fields[6],
                                 hdop		=> $fields[7],
-				age		=> $fields[12],
-			} ;
+				age		=> $fields[12]
+			); # } ;
+
+			$GGA_raw{$timestamp} = \%cga;
+			$time_dat{$timestamp}{cga} = \%cga;
 
                         foreach my $svc (@current) {
                                 # $svc->[0] = $timestamp;
@@ -80,8 +84,8 @@ while(<INFILE>) {
 			push (@data , @current) ;
 			print '$';
 			$times{$timestamp} = @current ; 
-                        # print Dumper(@current);
 
+                        # print Dumper(@current);
 
 		}
 		elsif ($2 eq 'GSV') {
@@ -129,6 +133,7 @@ while(<INFILE>) {
 
 				# build new data structure
 				$SVS_cnt{$sys_id}{$svn}{$sig_id}{count}++;
+				$time_dat{$timestamp}{count}++;
 				my %dp = (
 						timestamp => $timestamp,	
 						sys => $sys_id,
@@ -139,6 +144,7 @@ while(<INFILE>) {
 						snr => $snr
 					);
 				push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, \%dp ; 
+				push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, \%dp ;
 
 				print $#current, '~'; #  DEBUG
 			}
@@ -174,9 +180,14 @@ print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 
-print "---\%SVS_cnt-----------------------------------\n";
-print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
+# print "---\%SVS_cnt-----------------------------------\n";
+# print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
+# exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+
+print "---\%time_dat-----------------------------------\n";
+print Data::Dumper->Dump([\%time_dat], [qw(\%time_dat)] );
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+
 
 
 print "---\@data-----------------------------------\n";
