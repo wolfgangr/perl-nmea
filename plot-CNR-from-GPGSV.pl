@@ -127,9 +127,20 @@ while(<INFILE>) {
 				### printf ("sat no %i elevation %i azimuth %i SNR %i\n", $svn, $ele, $azi, $snr); 
 				push (@current, [$timestamp, $svn, $ele, $azi, $snr ] );
 
-				$SVS_cnt{$sys_id}{$svn}{$sig_id}++;
+				# build new data structure
+				$SVS_cnt{$sys_id}{$svn}{$sig_id}{count}++;
+				my %dp = (
+						timestamp => $timestamp,	
+						sys => $sys_id,
+						svn => $svn,
+						sig => $sig_id,
+						ele => $ele,
+						azi => $azi,
+						snr => $snr
+					);
+				push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, \%dp ; 
 
-				print $#current, '~';
+				print $#current, '~'; #  DEBUG
 			}
                         ### print ("\n");
 		}
