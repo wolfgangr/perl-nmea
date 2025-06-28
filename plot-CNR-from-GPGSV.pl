@@ -96,9 +96,10 @@ while(<INFILE>) {
 			#  7) SNR in dB
 			#  more satellite infos like 4)-7)
 
-			print $1;
+			my $sys_id = $1;
+			print $sys_id;
 			# print $fields[-1] ;
-			next unless ($1 eq 'P');    	# crude test hack: only GPS
+			next unless ($sys_id eq 'P');    	# crude test hack: only GPS
 			# next unless ($fields[-1] eq '1'); 	# crude NMEA 4.? hack: only L1 band
 			
 			print ("GPGSV-L1 record: ");
@@ -108,9 +109,9 @@ while(<INFILE>) {
 			my $msg_num = shift @fields;
 			my $sat_inV = shift @fields;
 
-			my $sys_id = pop @fields;
-			print $sys_id;
-			next unless ($sys_id eq '1');
+			my $sig_id = pop @fields;
+			print $sig_id;
+			next unless ($sig_id eq '1');
 
 			if ( $msg_num == 1 ) {
 				@current =(); 	# start a new sequence
