@@ -422,10 +422,6 @@ ENDOFCOMMAND
 	# add entry for multi SV animated gif
 	$command_anim .= "plot \"$tempdata_sv\" using 2:4 with points lt $SV\n";
 	
-	# add entry for elevation  over time
-  	### TBD .. check whether we need this
-	# $command_et .= "plot \"$tempdata_sv\" using 1:2 with lines lt $SV\n";
-	# $command_et .= "plot \"$tempdata_sv\" using 1:5 with lines lt $SV\n";
 }
 
 close SKYDATA;
@@ -454,11 +450,6 @@ gnuplotcmd($command_all);
 print "rendering animated gif plot\n";
 # render animated gif
 gnuplotcmd($command_anim);
-
-### TBD: check whether we need this
-# print "rendering elevation over time\n";
-# # render animated gif
-# gnuplotcmd($command_et);
 
 
 #=========================================================================0
