@@ -139,21 +139,22 @@ while(<INFILE>) {
 				# build new data structure
 				$SVS_cnt{$sys_id}{$svn}{$sig_id}{count}++;
 				$time_dat{$timestamp}{count}++;
-				#my %dp = (
-				#		timestamp => $timestamp,	
-				#		sys => $sys_id,
-				#		svn => $svn,
-				#		sig => $sig_id,
-				#		ele => $ele,
-				#		azi => $azi,
-				#		snr => $snr
-				#	);
-				# push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, \%dp ; 
+				my %dp = (
+						timestamp => $timestamp,	
+						sys => $sys_id,
+						svn => $svn,
+						sig => $sig_id,
+						ele => $ele,
+						azi => $azi,
+						snr => $snr
+					);
+				push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, \%dp ; 
 				# push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, \%dp ;
-
+				push @{ $time_dat{$timestamp}{data} }, \%dp ;
+	
 				# print $#current, '~'; #  DEBUG
-				push (@table, 
-					[ $timestamp,   $sys_id, $svn, $sig_id, $ele, $azi, $snr ] );
+				# push (@table, 
+				#	[ $timestamp,   $sys_id, $svn, $sig_id, $ele, $azi, $snr ] );
 				# push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, $#table;
 				# push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, $#table;
 
@@ -186,20 +187,20 @@ $Data::Dumper::Sortkeys = 1;
 
 
 print "---\%GGA_raw-----------------------------------\n";
-# print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
+print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
 print 'length of %GGA_raw: ', scalar %GGA_raw, '; ';
 print 'size of %GGA_raw is ', total_size(\%GGA_raw), "\n";
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%SVS_cnt-----------------------------------\n";
-# print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
+print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
 print 'length of %SVS_cnt: ', scalar %SVS_cnt, '; ';
 print 'size of %SVS_cnt is ', total_size(\%SVS_cnt), "\n";
 
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%time_dat-----------------------------------\n";
-# print Data::Dumper->Dump([\%time_dat], [qw(\%time_dat)] );
+print Data::Dumper->Dump([\%time_dat], [qw(\%time_dat)] );
 print 'length of %time_dat: ', scalar %time_dat, '; ';
 print 'size of %time_dat is ', total_size(\%time_dat), "\n";
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
