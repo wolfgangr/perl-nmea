@@ -72,7 +72,7 @@ while(<INFILE>) {
 
 		}
 		elsif ($2 eq 'GSV') {
-                        # print ("GSV-record: ");
+                        print ("|");
 
 			# http://www.nmea.de/nmea0183datensaetze.html#gsv 
 			#  1) total number of messages
@@ -83,6 +83,14 @@ while(<INFILE>) {
 			#  6) azimuth in degrees to true
 			#  7) SNR in dB
 			#  more satellite infos like 4)-7)
+
+			print $1;
+			print $fields[-1] ;
+			next unless ($1 eq 'P');    	# crude test hack: only GPS
+			# next unless ($fields[-1] == 1); 	# crude test hack: only L1 band
+			
+			print ("GPGSV-L1 record: ");
+
 
 			my $msg_tot = shift @fields;
 			my $msg_num = shift @fields;
@@ -120,10 +128,14 @@ close INFILE;
 print "======================== read complete =======================\n";
 print " ... rearranging data ... \n";
 
+print "---\@data-----------------------------------\n";
 print Dumper([@data]);
-print "--------------------------------------\n";
+
+exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+
+print "---\%times-----------------------------------\n";
 print Dumper([%times]);
-print "--------------------------------------\n";
+print "---\@svs-----------------------------------\n";
 print Dumper([@svs]);
 print "--------------------------------------\n";
 
