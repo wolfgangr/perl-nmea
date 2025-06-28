@@ -20,7 +20,7 @@ use strict;
 use Time::Local 'timegm_nocheck' ;	# tiny but what I need
 use Data::Dumper ;
 # use Math::Interpolate qw(linear_interpolate robust_interpolate);
-use Math::Spline;
+# use Math::Spline;
 
 use Devel::Size qw(size total_size);
 use Readonly;
@@ -285,72 +285,8 @@ exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~----------------------------
 
 }
 
-# do we still need that old stuff??
-my @data =(); # collection of pointers to all sv x time data
-my %times =();        # pointer to arrays of all data for each time
-my @svs =();  # count number of data for each sv
-
-if (0) {  # debug block
-
-print "---\@data-----------------------------------\n";
-print Data::Dumper->Dump([\@data] , [qw(\@data)]  );
-# exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
-
-print "---\%times-----------------------------------\n";
-print Data::Dumper->Dump([\%times], [qw(\%times)] );
-# exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
-
-
-print "---\@svs-----------------------------------\n";
-print Data::Dumper->Dump([\@svs], [qw(\@svs)] );
-print "--------------------------------------\n";
-exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
-}
-
 
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
-
-# create data structure for each satellite 
-
-my @sv_time = ();
-my @sv_ele = ();
-my @sv_azi = ();
-my @sv_snr = ();
-
-
-
-foreach my $SV (1 .. @svs) {
-	# print "SV number ", $SV, " ";
-	if (my $hits = $svs[$SV]) {
-		print "datapoints: " , $hits;
-	}
-	# print "\n";
-        $sv_time[$SV] = [];
-	$sv_ele[$SV] = [];
-	$sv_azi[$SV] = [];
-	$sv_snr[$SV] = [];
-}
-
-# hmmm whatever we do we need all our data in matching arrays
-# we like to keep them in higher level arrays by satelite number...
-
-# print Dumper([@sv_time]);
-
-foreach my $datapoint(@data) {
-  my $svn = $datapoint->[1];
-  # print "svn: ", $svn , " Datapoint: ", join ("|", @$datapoint) , "\n" ;
-  push @{$sv_time[$svn]}, ($datapoint->[0]);
-  push @{$sv_ele[$svn]} , ($datapoint->[2]);
-  push @{$sv_azi[$svn]} , ($datapoint->[3]);
-  push @{$sv_snr[$svn]} , ($datapoint->[4]);
-
-}
-
-# print Dumper([@sv_ele]);
-# print Dumper([@sv_snr]);
-
-# print Dumper([@sv_ele[12]]);
-# print Dumper([@sv_snr[12]]);
 
 #==============================================================================================
 
@@ -415,28 +351,14 @@ set xlabel 'Elevation in deg'
 set ylabel 'CNR in dbHz'
 ENDOFCMDANIM
 
-# elevation by time
-my $temppng_et = $tempfile_body . '_et.png';
-
-my $command_et = <<ENDOFCMDET;
-# elevation over time by SV
-set term png
-set output "$temppng_et"
-set yrange [-1:90]
-set multiplot
-set xdata time
-set timefmt "%s"
-set format x "%H:%M"
-set xrange [$data[0][0]-946684800:$data[-1][0]-946684800]
-set ylabel 'Elevation in deg'
-ENDOFCMDET
-
 # polar skyplot color coded
 my $tempdata_sky  = $tempfile_body . '_sky.data';	
 my $temppng_sky  = $tempfile_body . '_sky.png';		
 
 open (SKYDATA, ">".$tempdata_sky) || error ("could not create temp data file $tempdata_sky");
 
+
+my @svs; ### TBD syntax dummy .... to be replaced by new structure
 
 foreach my $SV (1 .. @svs) {
         my $hits;
@@ -452,10 +374,11 @@ foreach my $SV (1 .. @svs) {
 
 	foreach my $i (0..$#{$sv_time[$SV]}) {
 		printf DATAFILE ("%f %f %f %f %f %f\n", 
-			$sv_time[$SV][$i] ,
-			$sv_ele[$SV][$i] ,
-			$sv_azi[$SV][$i] ,
-			$sv_snr[$SV][$i] , 
+			### TBD
+			# $sv_time[$SV][$i] ,
+			# $sv_ele[$SV][$i] ,
+			# $sv_azi[$SV][$i] ,
+			# $sv_snr[$SV][$i] , 
 			'', ''
 			# $sv_ele_ip[$SV][$i] ,
 			# $sv_azi_ip[$SV][$i] 
@@ -465,8 +388,8 @@ foreach my $SV (1 .. @svs) {
 		printf 	SKYDATA ("%s %s %s\n",
 			# polar2xy ( angle, radius) ; angle in deg
 			# azimuth counts clockwise, elevation from zenith down
-			polar2xy(-$sv_azi[$SV][$i], 90 - $sv_ele[$SV][$i]),
-			$sv_snr[$SV][$i] 
+			#### TBD polar2xy(-$sv_azi[$SV][$i], 90 - $sv_ele[$SV][$i]),
+			# $sv_snr[$SV][$i] 
 		);
 	}
 
@@ -499,8 +422,9 @@ ENDOFCOMMAND
 	$command_anim .= "plot \"$tempdata_sv\" using 2:4 with points lt $SV\n";
 	
 	# add entry for elevation  over time
-	$command_et .= "plot \"$tempdata_sv\" using 1:2 with lines lt $SV\n";
-	$command_et .= "plot \"$tempdata_sv\" using 1:5 with lines lt $SV\n";
+  	### TBD .. check whether we need this
+	# $command_et .= "plot \"$tempdata_sv\" using 1:2 with lines lt $SV\n";
+	# $command_et .= "plot \"$tempdata_sv\" using 1:5 with lines lt $SV\n";
 }
 
 close SKYDATA;
@@ -530,9 +454,10 @@ print "rendering animated gif plot\n";
 # render animated gif
 gnuplotcmd($command_anim);
 
-print "rendering elevation over time\n";
-# render animated gif
-gnuplotcmd($command_et);
+### TBD: check whether we need this
+# print "rendering elevation over time\n";
+# # render animated gif
+# gnuplotcmd($command_et);
 
 
 #=========================================================================0
