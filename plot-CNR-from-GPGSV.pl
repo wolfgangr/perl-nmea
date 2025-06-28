@@ -77,8 +77,8 @@ while(<INFILE>) {
 				age		=> $fields[12]
 			); # } ;
 
-			$GGA_raw{$timestamp} = \%cga;
-			# $time_dat{$timestamp}{cga} = \%cga;
+			# $GGA_raw{$timestamp} = \%cga;
+			$time_dat{$timestamp}{cga} = \%cga;
 
                         # foreach my $svc (@current) {
                         #         # $svc->[0] = $timestamp;
@@ -130,9 +130,9 @@ while(<INFILE>) {
 			
 			while ( @ fields) {
 				my $svn = shift @fields;
-				my $ele = shift @fields // -1;	# need Perl > 5.10 for // "defined or"
-				my $azi = shift @fields // -1;
-				my $snr = shift @fields // -1;
+				my $ele = shift @fields || -1;	# need Perl > 5.10 for // "defined or"
+				my $azi = shift @fields || -1;
+				my $snr = shift @fields || -1;
 				### printf ("sat no %i elevation %i azimuth %i SNR %i\n", $svn, $ele, $azi, $snr); 
 				# push (@current, [$timestamp, $svn, $ele, $azi, $snr ] );
 
@@ -143,10 +143,10 @@ while(<INFILE>) {
 						timestamp => $timestamp,	
 						sys => $sys_id,
 						svn => $svn,
-						sig => $sig_id,
-						ele => $ele,
-						azi => $azi,
-						snr => $snr
+						sig => int($sig_id),
+						ele => int($ele),
+						azi => int($azi),
+						snr => int($snr)
 					);
 				push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, \%dp ; 
 				# push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, \%dp ;
