@@ -77,8 +77,8 @@ while(<INFILE>) {
 				age		=> $fields[12]
 			); # } ;
 
-			# $GGA_raw{$timestamp} = \%cga;
-			$time_dat{$timestamp}{cga} = \%cga;
+			$GGA_raw{$timestamp} = \%cga;
+			# $time_dat{$timestamp}{cga} = \%cga;
 
                         # foreach my $svc (@current) {
                         #         # $svc->[0] = $timestamp;
