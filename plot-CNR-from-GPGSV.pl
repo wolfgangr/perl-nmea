@@ -25,7 +25,8 @@ my @data =();	# collection of pointers to all sv x time data
 my %times =(); 	# pointer to arrays of all data for each time
 my @svs =();	# count number of data for each sv
 
-my %SVS_raw = ();   # keep SV sys and sig IDs
+my %SVS_cnt = ();   # keep SV sys and sig IDs
+my %time_dat =();   # new data structure
 my %GGA_raw = ();   # keep GGA data
 
 # read input file name from cmd line 
@@ -99,7 +100,7 @@ while(<INFILE>) {
 			my $sys_id = $1;
 			print $sys_id;
 			# print $fields[-1] ;
-			next unless ($sys_id eq 'P');    	# crude test hack: only GPS
+			# next unless ($sys_id eq 'P');    	# crude test hack: only GPS
 			# next unless ($fields[-1] eq '1'); 	# crude NMEA 4.? hack: only L1 band
 			
 			print ("GPGSV-L1 record: ");
@@ -111,7 +112,7 @@ while(<INFILE>) {
 
 			my $sig_id = pop @fields;
 			print $sig_id;
-			next unless ($sig_id eq '1');
+			# next unless ($sig_id eq '1');
 
 			if ( $msg_num == 1 ) {
 				@current =(); 	# start a new sequence
@@ -125,6 +126,9 @@ while(<INFILE>) {
 				my $snr = shift @fields // -1;
 				### printf ("sat no %i elevation %i azimuth %i SNR %i\n", $svn, $ele, $azi, $snr); 
 				push (@current, [$timestamp, $svn, $ele, $azi, $snr ] );
+
+				$SVS_cnt{$sys_id}{$svn}{$sig_id}++;
+
 				print $#current, '~';
 			}
                         ### print ("\n");
@@ -152,9 +156,17 @@ if (1) {  # debug block
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 $Data::Dumper::Sortkeys = 1;
+
+
 print "---\%GGA_raw-----------------------------------\n";
 print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+
+
+print "---\%SVS_cnt-----------------------------------\n";
+print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
+exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+
 
 print "---\@data-----------------------------------\n";
 print Data::Dumper->Dump([\@data] , [qw(\@data)]  );
