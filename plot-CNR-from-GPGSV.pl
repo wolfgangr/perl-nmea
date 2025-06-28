@@ -154,8 +154,8 @@ while(<INFILE>) {
 				# print $#current, '~'; #  DEBUG
 				push (@table, 
 					[ $timestamp,   $sys_id, $svn, $sig_id, $ele, $azi, $snr ] );
-				push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, $#table;
-				push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, $#table;
+				# push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, $#table;
+				# push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, $#table;
 
 			}
                         ### print ("\n");
