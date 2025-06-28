@@ -4,6 +4,8 @@
 # see http://www.nmea.de/nmea0183datensaetze.html#gsv
 # extract Satellite view data
 # and plot div stuff 
+# refactored 2025 for multi SYS, multi band NMEA 4.whatever
+#
 # Wolfgang Rosner
 # wrosner@tirnet.de
 # provided "as is", don`pay me but don`t sue me...
@@ -21,13 +23,13 @@ use Data::Dumper ;
 use Math::Spline;
 
 # in a data base, this might be tables
-my @data =();	# collection of pointers to all sv x time data
-my %times =(); 	# pointer to arrays of all data for each time
-my @svs =();	# count number of data for each sv
+# my @data =();	# collection of pointers to all sv x time data
+# my %times =(); 	# pointer to arrays of all data for each time
+# my @svs =();	# count number of data for each sv
 
 my %SVS_cnt = ();   # keep SV sys and sig IDs
 my %time_dat =();   # new data structure
-my %GGA_raw = ();   # keep GGA data
+# my %GGA_raw = ();   # keep GGA data
 
 # read input file name from cmd line 
 
@@ -38,8 +40,8 @@ printf ("parsing input file %s\n",  $infile);
 
 # read input file
 
-my $timestamp;
-my @current;
+my $timestamp; # better be "static"?
+# my @current;
 
 
 while(<INFILE>) {
@@ -54,7 +56,7 @@ while(<INFILE>) {
 		if($2 eq 'GGA') {
                         # insert timestamp into all SV collected
 			$timestamp = $fields[0] ;
-			print "\nat $timestamp - ";
+			### print "\nat $timestamp - ";
 
 			# Table 7-4 GGA Data Structure
 			#	( N4 Products Commands and Logs Reference Book )
@@ -72,24 +74,24 @@ while(<INFILE>) {
 				age		=> $fields[12]
 			); # } ;
 
-			$GGA_raw{$timestamp} = \%cga;
+			# $GGA_raw{$timestamp} = \%cga;
 			$time_dat{$timestamp}{cga} = \%cga;
 
-                        foreach my $svc (@current) {
-                                # $svc->[0] = $timestamp;
-				$svs[ $svc->[1] ] ++; 	# count data per satellite
-                        }
+                        # foreach my $svc (@current) {
+                        #         # $svc->[0] = $timestamp;
+			# 	$svs[ $svc->[1] ] ++; 	# count data per satellite
+                        # }
 
 			# append all data of current epoch and keep number of records
-			push (@data , @current) ;
-			print '$';
-			$times{$timestamp} = @current ; 
+			# push (@data , @current) ;
+			### print '$';
+			# $times{$timestamp} = @current ; 
 
                         # print Dumper(@current);
 
 		}
 		elsif ($2 eq 'GSV') {
-                        print ("|");
+                        ### print ("|");
 			next unless $timestamp; # skip head until encounter a GNGGA
 			# http://www.nmea.de/nmea0183datensaetze.html#gsv 
 			#  1) total number of messages
@@ -102,12 +104,12 @@ while(<INFILE>) {
 			#  more satellite infos like 4)-7)
 
 			my $sys_id = $1;
-			print $sys_id;
+			### print $sys_id;
 			# print $fields[-1] ;
 			# next unless ($sys_id eq 'P');    	# crude test hack: only GPS
 			# next unless ($fields[-1] eq '1'); 	# crude NMEA 4.? hack: only L1 band
 			
-			print ("GPGSV-L1 record: ");
+			### print ("GPGSV-L1 record: ");
 
 
 			my $msg_tot = shift @fields;
@@ -115,13 +117,13 @@ while(<INFILE>) {
 			my $sat_inV = shift @fields;
 
 			my $sig_id = pop @fields;
-			print $sig_id;
+			### print $sig_id;
 			# next unless ($sig_id eq '1');
 
-			if ( $msg_num == 1 ) {
-				@current =(); 	# start a new sequence
-                                print '%';
-			}	
+			# if ( $msg_num == 1 ) {
+			#	# @current =(); 	# start a new sequence
+                        ###        print '%';
+			# }	
 			
 			while ( @ fields) {
 				my $svn = shift @fields;
@@ -129,7 +131,7 @@ while(<INFILE>) {
 				my $azi = shift @fields // -1;
 				my $snr = shift @fields // -1;
 				### printf ("sat no %i elevation %i azimuth %i SNR %i\n", $svn, $ele, $azi, $snr); 
-				push (@current, [$timestamp, $svn, $ele, $azi, $snr ] );
+				# push (@current, [$timestamp, $svn, $ele, $azi, $snr ] );
 
 				# build new data structure
 				$SVS_cnt{$sys_id}{$svn}{$sig_id}{count}++;
@@ -146,7 +148,7 @@ while(<INFILE>) {
 				push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, \%dp ; 
 				push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, \%dp ;
 
-				print $#current, '~'; #  DEBUG
+				# print $#current, '~'; #  DEBUG
 			}
                         ### print ("\n");
 		}
@@ -175,20 +177,27 @@ if (1) {  # debug block
 $Data::Dumper::Sortkeys = 1;
 
 
-print "---\%GGA_raw-----------------------------------\n";
-print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
+# print "---\%GGA_raw-----------------------------------\n";
+# print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 
-# print "---\%SVS_cnt-----------------------------------\n";
-# print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
+print "---\%SVS_cnt-----------------------------------\n";
+print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%time_dat-----------------------------------\n";
 print Data::Dumper->Dump([\%time_dat], [qw(\%time_dat)] );
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
+}
 
+# do we still need that old stuff??
+my @data =(); # collection of pointers to all sv x time data
+my %times =();        # pointer to arrays of all data for each time
+my @svs =();  # count number of data for each sv
+
+if (1) {  # debug block
 
 print "---\@data-----------------------------------\n";
 print Data::Dumper->Dump([\@data] , [qw(\@data)]  );
