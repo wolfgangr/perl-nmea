@@ -46,6 +46,9 @@ Readonly my @sigids => ( [],
 
 # https://de.wikipedia.org/wiki/Globales_Navigationssatellitensystem#/media/Datei:Gnss_bandwidth.svg
 # https://gssc.esa.int/navipedia/images/c/cf/GNSS_All_Signals.png
+# ... cum grano salis ...
+# TODO: update and cross-check
+
 Readonly my @sig_freqs => ( [],
 	[ 0, (1575.42) x 3, (1227.6) x 3, (1176.45) x 2 ],
 	[ 0, (1602) x 2, (1246) x 2],
@@ -54,6 +57,37 @@ Readonly my @sig_freqs => ( [],
 	[ 0, (1575.42) x 4, (1227.6) x 2, (1176.45) x 2 , (1278.75) x 2 ],
 	[ 0, (1176.45) x 4 , 1575.42 ]	
 );
+
+# mainly for crosschecking
+my %SIGPLAN;
+my @SIGPLAN_ary;
+
+for my $sys_idx (0 .. $#systems_ltr) {
+  my %sys_plan;
+  my @sys_plan_ary =();
+  my $sys_tag = $systems_tags[$sys_idx];
+
+  for my $sig_idx (0 .. $#{$sigids[$sys_idx]} ) {
+    print $sys_idx, '-', $sig_idx, "\n";
+    my $sig_tag = $sigids[$sys_idx][$sig_idx];
+    my $sig_frq = $sig_freqs[$sys_idx][$sig_idx];
+    $sys_plan{$sig_tag} = { 
+      sys_idx => $sys_idx,
+      sys_tag => $sys_tag,
+      sig_idx => $sig_idx,
+      sig_tag => $sig_tag,
+      frequ   => $sig_frq
+    } ;
+    push @sys_plan_ary, $sys_plan{$sig_tag};
+  }
+  $SIGPLAN{$sys_tag} = \%sys_plan;
+  push @SIGPLAN_ary, \@sys_plan_ary;
+}
+
+print Dumper (\%SIGPLAN);
+print Dumper (\@SIGPLAN_ary);
+
+exit;
 
 print Dumper (\%systems);
 print Dumper (\@sigids);
