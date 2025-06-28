@@ -34,15 +34,23 @@ open INFILE , $infile or die ("cannot read from input file named $infile");
 printf ("parsing input file %s\n",  $infile);
 
 # read input file
+
+my $timestamp;
+my @current;
+
+
 while(<INFILE>) {
 	# print $_;
 	chomp ; chop ; #  looks like chomp removes NL but leaves CR 
+
+	# my $timestamp;
+	# my @current;
 
 	# parse GSV lines
 	if( /^\$G([NPLBAQ])(\w{3}),(.*)(\*..)$/  ) { 
 	
 		my @fields = split (',' , $3);
-		my @current;
+		# my @current;
 
 		# if($2 eq 'RMC') {
 		#	print ("RMC-record: ");
@@ -58,7 +66,8 @@ while(<INFILE>) {
 
 		if($2 eq 'GGA') {
                         # insert timestamp into all SV collected
-			my $timestamp = $fields[0] ;
+			$timestamp = $fields[0] ;
+			print "\nat $timestamp - ";
                         foreach my $svc (@current) {
                                 $svc->[0] = $timestamp;
 				$svs[ $svc->[1] ] ++; 	# count data per satellite
@@ -66,6 +75,7 @@ while(<INFILE>) {
 
 			# append all data of current epoch and keep number of records
 			push (@data , @current) ;
+			print '$';
 			$times{$timestamp} = @current ; 
                         # print Dumper(@current);
 
@@ -73,7 +83,7 @@ while(<INFILE>) {
 		}
 		elsif ($2 eq 'GSV') {
                         print ("|");
-
+			next unless $timestamp; # skip head until encounter a GNGGA
 			# http://www.nmea.de/nmea0183datensaetze.html#gsv 
 			#  1) total number of messages
 			#  2) message number
@@ -97,7 +107,8 @@ while(<INFILE>) {
 			my $sat_inV = shift @fields;
 
 			if ( $msg_num == 1 ) {
-				@current =() 	# start a new sequence
+				@current =(); 	# start a new sequence
+                                print '%';
 			}	
 			
 			while ( @ fields) {
@@ -107,6 +118,7 @@ while(<INFILE>) {
 				my $snr = shift @fields // -1;
 				### printf ("sat no %i elevation %i azimuth %i SNR %i\n", $svn, $ele, $azi, $snr); 
 				push (@current, [0, $svn, $ele, $azi, $snr ] );
+				print $#current, '~';
 			}
                         ### print ("\n");
 		}
@@ -130,14 +142,17 @@ print " ... rearranging data ... \n";
 
 print "---\@data-----------------------------------\n";
 print Dumper([@data]);
-
-exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+# exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%times-----------------------------------\n";
 print Dumper([%times]);
+exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+
+
 print "---\@svs-----------------------------------\n";
 print Dumper([@svs]);
 print "--------------------------------------\n";
+exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 # create data structure for each satellite 
 
