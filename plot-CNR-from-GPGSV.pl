@@ -22,6 +22,9 @@ use Data::Dumper ;
 # use Math::Interpolate qw(linear_interpolate robust_interpolate);
 use Math::Spline;
 
+use Devel::Size qw(size total_size);
+
+
 # in a data base, this might be tables
 # my @data =();	# collection of pointers to all sv x time data
 # my %times =(); 	# pointer to arrays of all data for each time
@@ -29,7 +32,7 @@ use Math::Spline;
 
 my %SVS_cnt = ();   # keep SV sys and sig IDs
 my %time_dat =();   # new data structure
-# my %GGA_raw = ();   # keep GGA data
+my %GGA_raw = ();   # keep GGA data
 
 # read input file name from cmd line 
 
@@ -177,17 +180,23 @@ if (1) {  # debug block
 $Data::Dumper::Sortkeys = 1;
 
 
-# print "---\%GGA_raw-----------------------------------\n";
+print "---\%GGA_raw-----------------------------------\n";
 # print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
+print 'length of %GGA_raw: ', scalar %GGA_raw, '; ';
+print 'size of %GGA_raw is ', size(\%GGA_raw), "\n";
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
-
 print "---\%SVS_cnt-----------------------------------\n";
-print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
+# print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
+print 'length of %SVS_cnt: ', scalar %SVS_cnt, '; ';
+print 'size of %SVS_cnt is ', size(\%SVS_cnt), "\n";
+
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%time_dat-----------------------------------\n";
-print Data::Dumper->Dump([\%time_dat], [qw(\%time_dat)] );
+# print Data::Dumper->Dump([\%time_dat], [qw(\%time_dat)] );
+print 'length of %time_dat: ', scalar %time_dat, '; ';
+print 'size of %time_dat is ', size(\%time_dat), "\n";
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 }
