@@ -59,8 +59,8 @@ Readonly my @sig_freqs => ( [],
 );
 
 # mainly for crosschecking
-my %SIGPLAN;
-my @SIGPLAN_ary;
+my %SIG_TABLE;
+my @SIG_TABLE_ary;
 
 for my $sys_idx (0 .. $#systems_ltr) {
   my %sys_plan;
@@ -80,19 +80,17 @@ for my $sys_idx (0 .. $#systems_ltr) {
     } ;
     push @sys_plan_ary, $sys_plan{$sig_tag};
   }
-  $SIGPLAN{$sys_tag} = \%sys_plan;
-  push @SIGPLAN_ary, \@sys_plan_ary;
+  $SIG_TABLE{$sys_tag} = \%sys_plan;
+  push @SIG_TABLE_ary, \@sys_plan_ary;
 }
 
-print Dumper (\%SIGPLAN);
-print Dumper (\@SIGPLAN_ary);
-
-exit;
-
-print Dumper (\%systems);
-print Dumper (\@sigids);
-print Dumper (\@sig_freqs);
-exit;
+# print Dumper (\%SIG_TABLE);
+# print Dumper (\@SIG_TABLE_ary);
+# exit;
+# print Dumper (\%systems);
+# print Dumper (\@sigids);
+# print Dumper (\@sig_freqs);
+# exit;
 
 
 # in a data base, this might be tables
