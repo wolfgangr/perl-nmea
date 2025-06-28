@@ -23,6 +23,19 @@ use Data::Dumper ;
 use Math::Spline;
 
 use Devel::Size qw(size total_size);
+use Readonly;
+
+# Table 7-1 Satellite Systems and Abbreviations
+Readonly my @systems_tags => qw(Multi GPS GLONASS BDS Galileo QZSS IRNSS);
+Readonly my @systems_ltr  => qw(N      P   L      B    A      Q    I);
+Readonly my %systems => map { $systems_ltr[$_] => { 
+    letter => $systems_ltr[$_],
+    tag    => $systems_tags[$_],
+    idx    => $_
+  }    } (0 .. $#systems_ltr);
+
+print Dumper (\%systems);
+exit;
 
 
 # in a data base, this might be tables
