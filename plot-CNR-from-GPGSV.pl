@@ -359,6 +359,7 @@ open (SKYDATA, ">".$tempdata_sky) || error ("could not create temp data file $te
 
 
 my @svs; ### TBD syntax dummy .... to be replaced by new structure
+my @sv_time; ### TBD syntax dummy
 
 foreach my $SV (1 .. @svs) {
         my $hits;
@@ -469,6 +470,8 @@ my @sv_ele_V_cnt = map {[ (0) x 90 ]} (1 .. @svs) ;
 my @sv_ele_V_sum = map {[ (0) x 90 ]} (1 .. @svs) ;
 my @sv_ele_V_sum2sq = map {[ (0) x 90 ]} (1 .. @svs) ;
 
+
+my @data; ### TBD syntax dummy -  to be replaced
 # collect each sv  x elev-1-deg interval
 foreach my $dp(@data) {
 	my $svn = $dp->[1];
