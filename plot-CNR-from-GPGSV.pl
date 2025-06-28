@@ -253,7 +253,7 @@ print "======================== read complete =======================\n";
 print " ... rearranging data ... \n";
 
 
-if (1) {  # debug block
+if (0) {  # debug block
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 $Data::Dumper::Sortkeys = 1;
@@ -286,8 +286,23 @@ exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~----------------------------
 
 }
 
+#========================================
+# re-indexing systems x sv x sig
+
+my @svs_sorted;  # all combinations
+my @svs_sig1;    # only main band per system
+
+for my $sysref (@SIG_TABLE_ary) {
+  for my $sigref (@$sysref) {
+    printf("sys tag=%s - idx=%d || sig tag=%s - idx=%d \n", 
+	$sigref->{sys_tag}, $sigref->{sys_idx}, $sigref->{sig_tag}, $sigref->{sig_idx});
+  }
+}
 
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+
+
+
 
 #==============================================================================================
 
