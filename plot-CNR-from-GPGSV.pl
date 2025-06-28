@@ -34,6 +34,7 @@ Readonly my %systems => map { $systems_ltr[$_] => {
     idx    => $_
   }    } (0 .. $#systems_ltr);
 
+# Table 7-34 GNSS ID
 Readonly my @sigids => ( [],
 	[ qw(all L1_CA L1_PY L1_M L2_PY L2C-M L2C-L L5-I L5-Q) ],
 	[ qw(all G1_CA G1_P       G2_CA G2_P) ],
@@ -43,8 +44,20 @@ Readonly my @sigids => ( [],
 	[ qw(all L5_SPS S_SPS L5_RS S_RS L1_SPS ) ]
   );
 
+# https://de.wikipedia.org/wiki/Globales_Navigationssatellitensystem#/media/Datei:Gnss_bandwidth.svg
+# https://gssc.esa.int/navipedia/images/c/cf/GNSS_All_Signals.png
+Readonly my @sig_freqs => ( [],
+	[ 0, (1575.42) x 3, (1227.6) x 3, (1176.45) x 2 ],
+	[ 0, (1602) x 2, (1246) x 2],
+	[ 0, (1191.8) x 3, (1278.75) x 2, (1575.42) x 2 ],
+	[ 0, (1575.42) x 4, (1191.8) x 3, (1268.52) x 3 , (1207.14) x 2 ],
+	[ 0, (1575.42) x 4, (1227.6) x 2, (1176.45) x 2 , (1278.75) x 2 ],
+	[ 0, (1176.45) x 4 , 1575.42 ]	
+);
+
 print Dumper (\%systems);
 print Dumper (\@sigids);
+print Dumper (\@sig_freqs);
 exit;
 
 
