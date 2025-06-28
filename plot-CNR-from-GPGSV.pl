@@ -68,7 +68,7 @@ for my $sys_idx (0 .. $#systems_ltr) {
   my $sys_tag = $systems_tags[$sys_idx];
 
   for my $sig_idx (0 .. $#{$sigids[$sys_idx]} ) {
-    print $sys_idx, '-', $sig_idx, "\n";
+    # print $sys_idx, '-', $sig_idx, "\n";
     my $sig_tag = $sigids[$sys_idx][$sig_idx];
     my $sig_frq = $sig_freqs[$sys_idx][$sig_idx];
     $sys_plan{$sig_tag} = { 
@@ -252,7 +252,7 @@ print "======================== read complete =======================\n";
 print " ... rearranging data ... \n";
 
 
-if (1) {  # debug block
+if (0) {  # debug block
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 $Data::Dumper::Sortkeys = 1;
@@ -290,7 +290,7 @@ my @data =(); # collection of pointers to all sv x time data
 my %times =();        # pointer to arrays of all data for each time
 my @svs =();  # count number of data for each sv
 
-if (1) {  # debug block
+if (0) {  # debug block
 
 print "---\@data-----------------------------------\n";
 print Data::Dumper->Dump([\@data] , [qw(\@data)]  );
@@ -306,6 +306,9 @@ print Data::Dumper->Dump([\@svs], [qw(\@svs)] );
 print "--------------------------------------\n";
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 }
+
+
+exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 # create data structure for each satellite 
 
@@ -348,83 +351,6 @@ foreach my $datapoint(@data) {
 
 # print Dumper([@sv_ele[12]]);
 # print Dumper([@sv_snr[12]]);
-
-#==============================================================================================
-# interpolate AZI and ELE between integer jumps
-print "inerpolating AZI and ELE...\n";
-
-
-my @sv_azi_st = ();
-my @sv_azi_sa = ();
-my @sv_azi_ip = ();
-
-my @sv_ele_st = ();
-my @sv_ele_se = ();
-my @sv_ele_ip = ();
-
-
-foreach my $SV (1 .. @svs) {
-	if (! (my $hits = $svs[$SV])) { next ; }
-	
-	# arrays to collect support points
-	$sv_azi_st[$SV] = [];
-	$sv_azi_sa[$SV] = [];
-	$sv_azi_ip[$SV] = [];
-
-	$sv_ele_st[$SV] = [];
-	$sv_ele_se[$SV] = [];
-	$sv_ele_ip[$SV] = [];
-
-	# my $last_ta = $sv_time[$SV][0];
-	my $last_aa = $sv_azi[$SV][0];
-	# my $last_te = $sv_time[$SV][0];
-	my $last_ee = $sv_ele[$SV][0];
-
-	# search support point at jumps of azi / ele values
-	foreach my $i (1..$#{$sv_time[$SV]}) {
-		if ($last_aa != $sv_azi[$SV][$i]) {
-			# azi step found
-			push @{$sv_azi_st[$SV]}, ( 0.5 * ($sv_time[$SV][$i-1] + $sv_time[$SV][$i])) ;
-			push @{$sv_azi_sa[$SV]}, ( 0.5 * ($last_aa + $sv_azi[$SV][$i])) ;
-			# $last_ta = $sv_time[$SV][$i];
-			$last_aa = $sv_azi[$SV][$i];
-		}
-		if ($last_ee != $sv_ele[$SV][$i]) {
-			# ele step found
-			push @{$sv_ele_st[$SV]}, ( 0.5 * ($sv_time[$SV][$i-1] + $sv_time[$SV][$i])) ;
-			push @{$sv_ele_se[$SV]}, ( 0.5 * ($last_ee + $sv_ele[$SV][$i])) ;
-			# $last_te = $sv_time[$SV][$i];
-			$last_ee = $sv_ele[$SV][$i];
-		}
-	}
-
-	# always add start and end points
-	push @{$sv_azi_st[$SV]}, $sv_time[$SV][-1] ;
-	push @{$sv_azi_sa[$SV]}, $sv_azi[$SV][-1] ;
-	unshift @{$sv_azi_st[$SV]}, $sv_time[$SV][0] ;
-	unshift @{$sv_azi_sa[$SV]}, $sv_azi[$SV][0] ;
-
-	push @{$sv_ele_st[$SV]}, $sv_time[$SV][-1] ;
-	push @{$sv_ele_se[$SV]}, $sv_ele[$SV][-1] ;
-	unshift @{$sv_ele_st[$SV]}, $sv_time[$SV][0] ;
-	unshift @{$sv_ele_se[$SV]}, $sv_ele[$SV][0] ;
-
-
-	# now use the spline
-	# printf "---------- SV %d", $SV;
-	# print Dumper([@sv_azi_st[$SV]]);
-	# print Dumper([@sv_azi_sa[$SV]]);
-	# print Dumper([@sv_ele_st[$SV]]);
-	# print Dumper([@sv_ele_se[$SV]]);
-	
-	my $spline_az = new Math::Spline(\@{$sv_azi_st[$SV]}, \@{$sv_azi_sa[$SV]});
-	my $spline_el = new Math::Spline(\@{$sv_ele_st[$SV]}, \@{$sv_ele_se[$SV]});
-
-	foreach my $i (1..$#{$sv_time[$SV]}) {
-		$sv_azi_ip[$SV][$i] = $spline_az->evaluate($sv_time[$SV][$i]);
-		$sv_ele_ip[$SV][$i] = $spline_el->evaluate($sv_time[$SV][$i]);
-	}
-}
 
 #==============================================================================================
 
@@ -529,9 +455,10 @@ foreach my $SV (1 .. @svs) {
 			$sv_time[$SV][$i] ,
 			$sv_ele[$SV][$i] ,
 			$sv_azi[$SV][$i] ,
-			$sv_snr[$SV][$i] ,
-			$sv_ele_ip[$SV][$i] ,
-			$sv_azi_ip[$SV][$i] 
+			$sv_snr[$SV][$i] , 
+			'', ''
+			# $sv_ele_ip[$SV][$i] ,
+			# $sv_azi_ip[$SV][$i] 
 		);
 		
 		# convert polar data for skyplot
