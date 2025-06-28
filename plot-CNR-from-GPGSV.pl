@@ -33,7 +33,7 @@ use Devel::Size qw(size total_size);
 my %SVS_cnt = ();   # keep SV sys and sig IDs
 my %time_dat =();   # new data structure
 my %GGA_raw = ();   # keep GGA data
-
+my @table = ();	    # volume data table	
 # read input file name from cmd line 
 
 my $infile = $ARGV[0] or die ("usage: $0 someinputfile.name");
@@ -139,19 +139,24 @@ while(<INFILE>) {
 				# build new data structure
 				$SVS_cnt{$sys_id}{$svn}{$sig_id}{count}++;
 				$time_dat{$timestamp}{count}++;
-				my %dp = (
-						timestamp => $timestamp,	
-						sys => $sys_id,
-						svn => $svn,
-						sig => $sig_id,
-						ele => $ele,
-						azi => $azi,
-						snr => $snr
-					);
-				push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, \%dp ; 
-				push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, \%dp ;
+				#my %dp = (
+				#		timestamp => $timestamp,	
+				#		sys => $sys_id,
+				#		svn => $svn,
+				#		sig => $sig_id,
+				#		ele => $ele,
+				#		azi => $azi,
+				#		snr => $snr
+				#	);
+				# push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, \%dp ; 
+				# push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, \%dp ;
 
 				# print $#current, '~'; #  DEBUG
+				push (@table, 
+					[ $timestamp,   $sys_id, $svn, $sig_id, $ele, $azi, $snr ] );
+				push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, $#table;
+				push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, $#table;
+
 			}
                         ### print ("\n");
 		}
@@ -183,20 +188,26 @@ $Data::Dumper::Sortkeys = 1;
 print "---\%GGA_raw-----------------------------------\n";
 # print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
 print 'length of %GGA_raw: ', scalar %GGA_raw, '; ';
-print 'size of %GGA_raw is ', size(\%GGA_raw), "\n";
+print 'size of %GGA_raw is ', total_size(\%GGA_raw), "\n";
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%SVS_cnt-----------------------------------\n";
 # print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
 print 'length of %SVS_cnt: ', scalar %SVS_cnt, '; ';
-print 'size of %SVS_cnt is ', size(\%SVS_cnt), "\n";
+print 'size of %SVS_cnt is ', total_size(\%SVS_cnt), "\n";
 
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%time_dat-----------------------------------\n";
 # print Data::Dumper->Dump([\%time_dat], [qw(\%time_dat)] );
 print 'length of %time_dat: ', scalar %time_dat, '; ';
-print 'size of %time_dat is ', size(\%time_dat), "\n";
+print 'size of %time_dat is ', total_size(\%time_dat), "\n";
+# exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+
+print "---\@table-----------------------------------\n";
+# print Data::Dumper->Dump([\@table], [qw(\@table)] );
+print 'length of @table: ', scalar @table, '; ';
+print 'size of @table is ', total_size(\@table), "\n";
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 }
