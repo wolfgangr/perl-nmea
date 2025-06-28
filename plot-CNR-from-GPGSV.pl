@@ -209,7 +209,8 @@ while(<INFILE>) {
 				$time_dat{$timestamp}{count}++;
 				my %dp = (
 						timestamp => $timestamp,	
-						sys => $sys_id,
+						sys_ltr => $sys_id,
+						sys_id  => $systems{$sys_id}->{idx}, 
 						svn => int($svn),
 						sig => int($sig_id),
 						# ele => int($ele),
@@ -220,7 +221,7 @@ while(<INFILE>) {
 				$dp{azi} = int($azi) if $azi;
 				$dp{snr} = int($snr) if $snr;
 				
-				push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, \%dp ; 
+				push @{ $SVS_cnt{ $dp{sys_id} }{ $dp{svn} }{ $dp{sig} }{data} }, \%dp ; 
 				# push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, \%dp ;
 				push @{ $time_dat{$timestamp}{data} }, \%dp ;
 	
@@ -252,7 +253,7 @@ print "======================== read complete =======================\n";
 print " ... rearranging data ... \n";
 
 
-if (0) {  # debug block
+if (1) {  # debug block
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 $Data::Dumper::Sortkeys = 1;
@@ -265,11 +266,11 @@ $Data::Dumper::Sortkeys = 1;
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%SVS_cnt-----------------------------------\n";
-# print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
+print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
 print 'length of %SVS_cnt: ', scalar %SVS_cnt, '; ';
 print 'size of %SVS_cnt is ', total_size(\%SVS_cnt), "\n";
 
-# exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%time_dat-----------------------------------\n";
 print Data::Dumper->Dump([\%time_dat], [qw(\%time_dat)] );
