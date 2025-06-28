@@ -66,7 +66,7 @@ while(<INFILE>) {
 
 			# $GGA_raw{$timestamp} = {
 			my %cga = (
-				timestamp => $timestamp,
+				timestamp 	=> $timestamp,
 				lat 		=> $fields[1],
 				lat_dir		=> $fields[2],
                                 lon		=> $fields[3],
@@ -130,9 +130,9 @@ while(<INFILE>) {
 			
 			while ( @ fields) {
 				my $svn = shift @fields;
-				my $ele = shift @fields || -1;	# need Perl > 5.10 for // "defined or"
-				my $azi = shift @fields || -1;
-				my $snr = shift @fields || -1;
+				my $ele = shift @fields // undef;	# need Perl > 5.10 for // "defined or"
+				my $azi = shift @fields // undef;
+				my $snr = shift @fields // undef;
 				### printf ("sat no %i elevation %i azimuth %i SNR %i\n", $svn, $ele, $azi, $snr); 
 				# push (@current, [$timestamp, $svn, $ele, $azi, $snr ] );
 
@@ -142,12 +142,16 @@ while(<INFILE>) {
 				my %dp = (
 						timestamp => $timestamp,	
 						sys => $sys_id,
-						svn => $svn,
+						svn => int($svn),
 						sig => int($sig_id),
-						ele => int($ele),
-						azi => int($azi),
-						snr => int($snr)
+						# ele => int($ele),
+						# azi => int($azi),
+						# snr => int($snr)
 					);
+				$dp{ele} = int($ele) if $ele;
+				$dp{azi} = int($azi) if $azi;
+				$dp{snr} = int($snr) if $snr;
+				
 				push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, \%dp ; 
 				# push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, \%dp ;
 				push @{ $time_dat{$timestamp}{data} }, \%dp ;
@@ -200,7 +204,7 @@ print 'size of %SVS_cnt is ', total_size(\%SVS_cnt), "\n";
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%time_dat-----------------------------------\n";
-# print Data::Dumper->Dump([\%time_dat], [qw(\%time_dat)] );
+print Data::Dumper->Dump([\%time_dat], [qw(\%time_dat)] );
 print 'length of %time_dat: ', scalar %time_dat, '; ';
 print 'size of %time_dat is ', total_size(\%time_dat), "\n";
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
