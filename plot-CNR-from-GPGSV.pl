@@ -32,8 +32,8 @@ use Devel::Size qw(size total_size);
 
 my %SVS_cnt = ();   # keep SV sys and sig IDs
 my %time_dat =();   # new data structure
-my %GGA_raw = ();   # keep GGA data
-my @table = ();	    # volume data table	
+# my %GGA_raw = ();   # keep GGA data
+# my @table = ();	    # volume data table	
 # read input file name from cmd line 
 
 my $infile = $ARGV[0] or die ("usage: $0 someinputfile.name");
@@ -186,29 +186,29 @@ if (1) {  # debug block
 $Data::Dumper::Sortkeys = 1;
 
 
-print "---\%GGA_raw-----------------------------------\n";
-print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
-print 'length of %GGA_raw: ', scalar %GGA_raw, '; ';
-print 'size of %GGA_raw is ', total_size(\%GGA_raw), "\n";
+# print "---\%GGA_raw-----------------------------------\n";
+# print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
+# print 'length of %GGA_raw: ', scalar %GGA_raw, '; ';
+# print 'size of %GGA_raw is ', total_size(\%GGA_raw), "\n";
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%SVS_cnt-----------------------------------\n";
-print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
+# print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
 print 'length of %SVS_cnt: ', scalar %SVS_cnt, '; ';
 print 'size of %SVS_cnt is ', total_size(\%SVS_cnt), "\n";
 
 # exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 print "---\%time_dat-----------------------------------\n";
-print Data::Dumper->Dump([\%time_dat], [qw(\%time_dat)] );
+# print Data::Dumper->Dump([\%time_dat], [qw(\%time_dat)] );
 print 'length of %time_dat: ', scalar %time_dat, '; ';
 print 'size of %time_dat is ', total_size(\%time_dat), "\n";
-# exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
+exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
-print "---\@table-----------------------------------\n";
+# print "---\@table-----------------------------------\n";
 # print Data::Dumper->Dump([\@table], [qw(\@table)] );
-print 'length of @table: ', scalar @table, '; ';
-print 'size of @table is ', total_size(\@table), "\n";
+# print 'length of @table: ', scalar @table, '; ';
+# print 'size of @table is ', total_size(\@table), "\n";
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
 }
