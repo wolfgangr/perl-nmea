@@ -26,15 +26,25 @@ use Devel::Size qw(size total_size);
 use Readonly;
 
 # Table 7-1 Satellite Systems and Abbreviations
-Readonly my @systems_tags => qw(Multi GPS GLONASS BDS Galileo QZSS IRNSS);
-Readonly my @systems_ltr  => qw(N      P   L      B    A      Q    I);
+Readonly my @systems_tags => qw(Multi GPS GLONASS Galileo BDS QZSS IRNSS);
+Readonly my @systems_ltr  => qw(N      P   L       A      B   Q    I);
 Readonly my %systems => map { $systems_ltr[$_] => { 
     letter => $systems_ltr[$_],
     tag    => $systems_tags[$_],
     idx    => $_
   }    } (0 .. $#systems_ltr);
 
+Readonly my @sigids => ( [],
+	[ qw(all L1_CA L1_PY L1_M L2_PY L2C-M L2C-L L5-I L5-Q) ],
+	[ qw(all G1_CA G1_P       G2_CA G2_P) ],
+	[ qw(all E5a E5b E5ab E6A E6BC L1A L1BC ) ],
+	[ qw(all B1I B1Q B1C B1A B2a B2b B2ab B3I B3Q B3A B2I B2Q ) ],
+	[ qw(all L1CA L1CD L1CP LIS L2CM L2CL L5I L5Q L6D L6E ) ],
+	[ qw(all L5_SPS S_SPS L5_RS S_RS L1_SPS ) ]
+  );
+
 print Dumper (\%systems);
+print Dumper (\@sigids);
 exit;
 
 
