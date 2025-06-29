@@ -85,7 +85,7 @@ for my $sys_idx (0 .. $#systems_ltr) {
 }
 
 # print Dumper (\%SIG_TABLE);
-# print Dumper (\@SIG_TABLE_ary);
+print Dumper (\@SIG_TABLE_ary);
 # exit;
 # print Dumper (\%systems);
 # print Dumper (\@sigids);
@@ -293,9 +293,19 @@ my @svs_sorted;  # all combinations
 my @svs_sig1;    # only main band per system
 
 for my $sysref (@SIG_TABLE_ary) {
+  ### TBD next unless ... we have sats in this system ....
+
+  my $sys_idx = $$sysref[0]->{sys_idx};    # $system->{sys_idx}->{idx};
+  my $satnum = scalar keys %{$SVS_cnt{$sys_idx}} ;
+  printf("idx=%d - num sat=%d \n", $sys_idx, $satnum );
+  next unless $satnum ;
+
   for my $sigref (@$sysref) {
+    next if $sigref->{sig_idx} == 0;
     printf("sys tag=%s - idx=%d || sig tag=%s - idx=%d \n", 
-	$sigref->{sys_tag}, $sigref->{sys_idx}, $sigref->{sig_tag}, $sigref->{sig_idx});
+      $sigref->{sys_tag}, $sigref->{sys_idx}, $sigref->{sig_tag}, $sigref->{sig_idx});
+    # next if $sigref->{sig_idx} == 0;
+
   }
 }
 
