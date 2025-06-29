@@ -340,12 +340,10 @@ my $temppng_sky  = $tempfile_body . '_sky.png';
 
 open (SKYDATA, ">".$tempdata_sky) || error ("could not create temp data file $tempdata_sky");
 
-my @svs; ### TBD syntax dummy .... to be replaced by new structure
-# my @sv_time; ### TBD syntax dummy
+# my @svs; ### TBD syntax dummy .... to be replaced by new structure
 
 my $lt = 0 ; # gnuplot linetype
 foreach my $SVobj (@svs_sorted) {
-	# my $SV    = $SVobj->{sv_nr};
 	# 3 usages of $SV: gnuplot lt aka line type, file name, human readable label
 	$lt++; # resemble old $SV behaviour by assigning every combination a new line type
         my $SVstr = sprintf("%s_%03d_%s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
@@ -353,42 +351,36 @@ foreach my $SVobj (@svs_sorted) {
 	my @data = @{$SVobj->{data}} ;
 	# print Dumper($SVobj);
 	# print Dumper(\@data);
-	# exit;
 
 	my $temppng_sv  = sprintf ("%s_%s.png", $tempfile_body , $SVstr);
 	my $tempdata_sv = sprintf ("%s_%s.data", $tempfile_body , $SVstr);
 
 	printf ("writing data for SV %s with %d data points ... \n", $SVhstr, scalar @data );
-	# exit;
 
 	open (DATAFILE, ">".$tempdata_sv) || error ("could not create temp data file $tempdata_sv");
 
 	foreach my $dp (@data ) { # 	i	(0..$#{$sv_time[$SV]}) {
 		# print Dumper(\$dp);
 		# exit;
+		# next unless defined $dp;
+		# next unless $dp;
+		next unless defined $dp->{timestamp};
+		next unless defined $dp->{ele};
+		next unless defined $dp->{azi};
+		next unless defined $dp->{snr};
 
 		printf DATAFILE ("%s %f %f %f \n", 
 			$dp->{timestamp},
 			$dp->{ele},
 			$dp->{azi},
 			$dp->{snr},
-			### TBD
-			# $sv_time[$SV][$i] ,
-			# $sv_ele[$SV][$i] ,
-			# $sv_azi[$SV][$i] ,
-			# $sv_snr[$SV][$i] , 
-		);
+	 	     );
 		
 		# convert polar data for skyplot
 		printf 	SKYDATA ("%s %s %s\n",
 			polar2xy(-$dp->{azi}, 90 - $dp->{ele}),
                         $dp->{snr}, 
-			# polar2xy ( angle, radius) ; angle in deg
-			# azimuth counts clockwise, elevation from zenith down
-			#### TBD polar2xy(-$sv_azi[$SV][$i], 90 - $sv_ele[$SV][$i]),
-			# $sv_snr[$SV][$i] 
 		);
-		# exit;
 	}
 
 	close DATAFILE || error ("could not close temp data file $tempdata_sv");
@@ -449,7 +441,7 @@ print "rendering animated gif plot\n";
 gnuplotcmd($command_anim);
 
 die ("DEBUG after standard plots"); #=========================~~~~~~~~~~~~~~~~~~~~-----------------
-
+my @svs; ### TBD moved dummy
 #=========================================================================0
 print "collecting statistical values\n";
 # we might initialize arrays like
