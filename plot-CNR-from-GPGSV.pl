@@ -336,11 +336,9 @@ ENDOFCMDANIM
 my $tempdata_sky  = $tempfile_body . '_sky.data';	
 my $temppng_sky  = $tempfile_body . '_sky.png';		
 
-die("DEBUG cutting edge"); #===============================~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~----------------------------
+# die("DEBUG cutting edge"); #===============================~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~----------------------------
 
 open (SKYDATA, ">".$tempdata_sky) || error ("could not create temp data file $tempdata_sky");
-
-
 
 my @svs; ### TBD syntax dummy .... to be replaced by new structure
 my @sv_time; ### TBD syntax dummy
@@ -357,7 +355,7 @@ foreach my $SV (1 .. @svs) {
 
 	open (DATAFILE, ">".$tempdata_sv) || error ("could not create temp data file $tempdata_sv");
 
-	foreach my $i (0..$#{$sv_time[$SV]}) {
+	foreach my $i ( () ) { # (0..$#{$sv_time[$SV]}) {
 		printf DATAFILE ("%f %f %f %f %f %f\n", 
 			### TBD
 			# $sv_time[$SV][$i] ,
@@ -435,6 +433,7 @@ print "rendering animated gif plot\n";
 # render animated gif
 gnuplotcmd($command_anim);
 
+die ("DEBUG after standard plots"); #=========================~~~~~~~~~~~~~~~~~~~~-----------------
 
 #=========================================================================0
 print "collecting statistical values\n";
