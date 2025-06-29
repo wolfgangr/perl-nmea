@@ -92,31 +92,20 @@ for my $sys_idx (0 .. $#systems_ltr) {
 # print Dumper (\@sig_freqs);
 # exit;
 
-
-# in a data base, this might be tables
-# my @data =();	# collection of pointers to all sv x time data
-# my %times =(); 	# pointer to arrays of all data for each time
-# my @svs =();	# count number of data for each sv
+# read input file name from cmd line ==================================================================
 
 my %SVS_cnt = ();   # keep SV sys and sig IDs
 my %time_dat =();   # new data structure
-# my %GGA_raw = ();   # keep GGA data
-# my @table = ();	    # volume data table	
-# read input file name from cmd line 
 
 my $infile = $ARGV[0] or die ("usage: $0 someinputfile.name");
 open INFILE , $infile or die ("cannot read from input file named $infile");
-
 printf ("parsing input file %s\n",  $infile);
 
 # read input file
 
 my $timestamp; # better be "static"?
-# my @current;
-
 
 while(<INFILE>) {
-	# print $_;
 	chomp ; chop ; #  looks like chomp removes NL but leaves CR 
 
 	# parse GSV lines
@@ -127,12 +116,9 @@ while(<INFILE>) {
 		if($2 eq 'GGA') {
                         # insert timestamp into all SV collected
 			$timestamp = $fields[0] ;
-			### print "\nat $timestamp - ";
 
 			# Table 7-4 GGA Data Structure
 			#	( N4 Products Commands and Logs Reference Book )
-
-			# $GGA_raw{$timestamp} = {
 			my %cga = (
 				timestamp 	=> $timestamp,
 				lat 		=> $fields[1],
@@ -143,26 +129,13 @@ while(<INFILE>) {
                                 n_sats		=> $fields[6],
                                 hdop		=> $fields[7],
 				age		=> $fields[12]
-			); # } ;
+			); 
 
-			# $GGA_raw{$timestamp} = \%cga;
+			# %time_dat is main data collector
 			$time_dat{$timestamp}{cga} = \%cga;
-
-                        # foreach my $svc (@current) {
-                        #         # $svc->[0] = $timestamp;
-			# 	$svs[ $svc->[1] ] ++; 	# count data per satellite
-                        # }
-
-			# append all data of current epoch and keep number of records
-			# push (@data , @current) ;
-			### print '$';
-			# $times{$timestamp} = @current ; 
-
-                        # print Dumper(@current);
-
 		}
+
 		elsif ($2 eq 'GSV') {
-                        ### print ("|");
 			next unless $timestamp; # skip head until encounter a GNGGA
 			# http://www.nmea.de/nmea0183datensaetze.html#gsv 
 			#  1) total number of messages
@@ -175,34 +148,18 @@ while(<INFILE>) {
 			#  more satellite infos like 4)-7)
 
 			my $sys_id = $1;
-			### print $sys_id;
-			# print $fields[-1] ;
-			# next unless ($sys_id eq 'P');    	# crude test hack: only GPS
-			# next unless ($fields[-1] eq '1'); 	# crude NMEA 4.? hack: only L1 band
 			
-			### print ("GPGSV-L1 record: ");
-
-
 			my $msg_tot = shift @fields;
 			my $msg_num = shift @fields;
 			my $sat_inV = shift @fields;
 
 			my $sig_id = pop @fields;
-			### print $sig_id;
-			# next unless ($sig_id eq '1');
-
-			# if ( $msg_num == 1 ) {
-			#	# @current =(); 	# start a new sequence
-                        ###        print '%';
-			# }	
 			
 			while ( @ fields) {
 				my $svn = shift @fields;
 				my $ele = shift @fields // undef;	# need Perl > 5.10 for // "defined or"
 				my $azi = shift @fields // undef;
 				my $snr = shift @fields // undef;
-				### printf ("sat no %i elevation %i azimuth %i SNR %i\n", $svn, $ele, $azi, $snr); 
-				# push (@current, [$timestamp, $svn, $ele, $azi, $snr ] );
 
 				# build new data structure
 				$SVS_cnt{$sys_id}{$svn}{$sig_id}{count}++;
@@ -213,26 +170,15 @@ while(<INFILE>) {
 						sys_id  => $systems{$sys_id}->{idx}, 
 						svn => int($svn),
 						sig => int($sig_id),
-						# ele => int($ele),
-						# azi => int($azi),
-						# snr => int($snr)
 					);
 				$dp{ele} = int($ele) if $ele;
 				$dp{azi} = int($azi) if $azi;
 				$dp{snr} = int($snr) if $snr;
 				
 				push @{ $SVS_cnt{ $dp{sys_id} }{ $dp{svn} }{ $dp{sig} }{data} }, \%dp ; 
-				# push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, \%dp ;
 				push @{ $time_dat{$timestamp}{data} }, \%dp ;
 	
-				# print $#current, '~'; #  DEBUG
-				# push (@table, 
-				#	[ $timestamp,   $sys_id, $svn, $sig_id, $ele, $azi, $snr ] );
-				# push @{ $SVS_cnt{$sys_id}{$svn}{$sig_id}{data} }, $#table;
-				# push @{ $time_dat{$timestamp}{data}{$sys_id}{$svn}{$sig_id} }, $#table;
-
 			}
-                        ### print ("\n");
 		}
 	} else {
 
@@ -240,9 +186,6 @@ while(<INFILE>) {
 		printf  ">>>$_<<<";
 		print "\n";
 	}
-
-
-
 }
 
 close INFILE;
@@ -258,13 +201,6 @@ if (0) {  # debug block
 
 $Data::Dumper::Sortkeys = 1;
 
-
-# print "---\%GGA_raw-----------------------------------\n";
-# print Data::Dumper->Dump([\%GGA_raw], [qw(\%GGA_raw)] );
-# print 'length of %GGA_raw: ', scalar %GGA_raw, '; ';
-# print 'size of %GGA_raw is ', total_size(\%GGA_raw), "\n";
-# exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
-
 print "---\%SVS_cnt-----------------------------------\n";
 print Data::Dumper->Dump([\%SVS_cnt], [qw(\%SVS_cnt)] );
 print 'length of %SVS_cnt: ', scalar %SVS_cnt, '; ';
@@ -278,15 +214,9 @@ print 'length of %time_dat: ', scalar %time_dat, '; ';
 print 'size of %time_dat is ', total_size(\%time_dat), "\n";
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
-# print "---\@table-----------------------------------\n";
-# print Data::Dumper->Dump([\@table], [qw(\@table)] );
-# print 'length of @table: ', scalar @table, '; ';
-# print 'size of @table is ', total_size(\@table), "\n";
-exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
-
 }
 
-#========================================
+#=============================================================================================================
 # re-indexing systems x sv x sig
 
 my @svs_sorted;  # all combinations
