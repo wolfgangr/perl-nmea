@@ -234,10 +234,6 @@ for my $sysref (@SIG_TABLE_ary) {
   for my $sv_idx (sort { $a <=> $b }  keys %system) {
     my @sv_sigs = sort { $a <=> $b }  keys %{ $system{$sv_idx} };
 
-    # print "sat # ", $sv_idx , "  has data in sig bands: ";
-    # print join ' - ', @sv_sigs;
-    # print "\n";
-
     for my $svsig (@sv_sigs) {
       # array sorted by system / sv / sig -> %entry
       # - SIG_TABLE data
@@ -248,7 +244,6 @@ for my $sysref (@SIG_TABLE_ary) {
                 data => $system{$sv_idx}->{$svsig}->{data}
          );
       push @svs_sorted, \%entry;
-      # push @svs_sig1, \%entry if ( $entry{sig_idx} == 1 );     
       push @svs_sig1, \%entry if ( $svsig == 1 );
     }
   }
