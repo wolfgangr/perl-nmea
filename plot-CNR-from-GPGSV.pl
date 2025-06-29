@@ -341,17 +341,23 @@ my $temppng_sky  = $tempfile_body . '_sky.png';
 open (SKYDATA, ">".$tempdata_sky) || error ("could not create temp data file $tempdata_sky");
 
 my @svs; ### TBD syntax dummy .... to be replaced by new structure
-my @sv_time; ### TBD syntax dummy
+# my @sv_time; ### TBD syntax dummy
 
-foreach my $SV (1 .. @svs) {
-        my $hits;
-	if (! ( $hits = $svs[$SV])) { next ; }
-
+foreach my $SVobj (@svs_sorted) {
+	my $SV    = $SVobj->{sv_nr};
+	my @data = @{$SVobj->{data}} ;
+        # my $hits  = scalar @data ;
+	# if (! ( $hits = $svs[$SV])) { next ; }
+	# print Dumper($SVobj);
+	print Dumper(\@data);
+	# exit;
+	# my $SV ;
 
 	my $temppng_sv  = sprintf ("%s_%03d.png", $tempfile_body , $SV);
 	my $tempdata_sv = sprintf ("%s_%03d.data", $tempfile_body , $SV);
 
-	printf ("writing data for SV# %d with %d data points ... ", $SV, $hits);
+	printf ("writing data for SV# %d with %d data points ... \n", $SV, scalar @data );
+	exit;
 
 	open (DATAFILE, ">".$tempdata_sv) || error ("could not create temp data file $tempdata_sv");
 
