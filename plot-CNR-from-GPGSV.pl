@@ -85,7 +85,7 @@ for my $sys_idx (0 .. $#systems_ltr) {
 }
 
 # print Dumper (\%SIG_TABLE);
-print Dumper (\@SIG_TABLE_ary);
+# print Dumper (\@SIG_TABLE_ary);
 # exit;
 # print Dumper (\%systems);
 # print Dumper (\@sigids);
@@ -293,51 +293,44 @@ my @svs_sorted;  # all combinations
 my @svs_sig1;    # only main band per system
 
 for my $sysref (@SIG_TABLE_ary) {
-  ### TBD next unless ... we have sats in this system ....
-  # my %system = %{$SVS_cnt{$sys_idx}};
   my $sys_idx = $$sysref[0]->{sys_idx};    # $system->{sys_idx}->{idx};
-  # next unless defined $sys_idx;
+  next unless defined $sys_idx;
   next unless defined $SVS_cnt{$sys_idx};
   my %system = %{$SVS_cnt{$sys_idx}};
   my $satnum = scalar keys %system ;
-  printf("idx=%d - num sat=%d \n", $sys_idx, $satnum );
+  # printf("idx=%d - num sat=%d \n", $sys_idx, $satnum );
   next unless $satnum ;
-
-  if (0) {
-  for my $sigref (@$sysref) {
-    next if $sigref->{sig_idx} == 0;
-    printf("sys tag=%s - idx=%d || sig tag=%s - idx=%d \n", 
-      $sigref->{sys_tag}, $sigref->{sys_idx}, $sigref->{sig_tag}, $sigref->{sig_idx});
-    # next if $sigref->{sig_idx} == 0;
-    # for my $sv_ref (sort keys %{$SVS_cnt{$sys_idx}}
-
-  } }
 
   for my $sv_idx (sort { $a <=> $b }  keys %system) {
     my @sv_sigs = sort { $a <=> $b }  keys %{ $system{$sv_idx} };
 
-    print "sat # ", $sv_idx , "  has data in sig bands: ";
-    print join ' - ', @sv_sigs;
-    print "\n";
+    # print "sat # ", $sv_idx , "  has data in sig bands: ";
+    # print join ' - ', @sv_sigs;
+    # print "\n";
 
     for my $svsig (@sv_sigs) {
       # array sorted by system / sv / sig -> %entry
       # - SIG_TABLE data
       # - SV number
+      # - data from G*GSV sentences
       my %entry = ( %{$$sysref[$svsig] },
 		sv_nr => $sv_idx ,
                 data => $system{$sv_idx}->{$svsig}->{data}
-         ); ### is this a duplicated hash?? TBD: add data array
-      ########### ==========~~~~~~~~~~~~-----------------
+         );
       push @svs_sorted, \%entry;
-      push @svs_sig1, \%entry if ( $entry{sig_idx} == 1 );     
+      # push @svs_sig1, \%entry if ( $entry{sig_idx} == 1 );     
+      push @svs_sig1, \%entry if ( $svsig == 1 );
     }
   }
 }
 
 $Data::Dumper::Sortkeys = 1;
-print Data::Dumper->Dump([\@svs_sorted], [qw(\@svs_sorted)] );
-print Data::Dumper->Dump([\@svs_sig1],   [qw(\@svs_sig1)] );
+# print Data::Dumper->Dump([\@svs_sorted], [qw(\@svs_sorted)] );
+# print Data::Dumper->Dump([\@svs_sig1],   [qw(\@svs_sig1)] );
+
+printf "\@svs_sorted has %d entries\n"  , scalar @svs_sorted;
+printf "\@svs_sig1   has %d entries\n"  , scalar @svs_sig1;
+
 
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
