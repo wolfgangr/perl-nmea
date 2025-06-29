@@ -326,7 +326,7 @@ for my $sysref (@SIG_TABLE_ary) {
       # - SV number
       my %entry = ( %{$$sysref[$svsig] },
 		sv_nr => $sv_idx ,
-
+                data => $system{$sv_idx}->{$svsig}->{data}
          ); ### is this a duplicated hash?? TBD: add data array
       ########### ==========~~~~~~~~~~~~-----------------
       push @svs_sorted, \%entry;
