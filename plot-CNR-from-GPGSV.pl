@@ -331,6 +331,19 @@ $Data::Dumper::Sortkeys = 1;
 printf "\@svs_sorted has %d entries\n"  , scalar @svs_sorted;
 printf "\@svs_sig1   has %d entries\n"  , scalar @svs_sig1;
 
+if(1) {
+  print "sorted Data for Satellites\n";
+  for my $entryref (@svs_sorted) {
+    printf ("system: %s      \t sv: %d  \t %.1s sig %s \t(%.2f MHz)  \t data points: %d \n",
+      $entryref->{sys_tag} , $entryref->{sv_nr}, 
+      ($entryref->{sig_idx} ==1) ? '*' : ' ',
+      $entryref->{sig_tag}, $entryref->{frequ}, 
+      scalar @{ $entryref->{data} } );
+
+  }
+}
+
+
 
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
