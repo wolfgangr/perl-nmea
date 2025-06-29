@@ -296,7 +296,8 @@ for my $sysref (@SIG_TABLE_ary) {
   ### TBD next unless ... we have sats in this system ....
   # my %system = %{$SVS_cnt{$sys_idx}};
   my $sys_idx = $$sysref[0]->{sys_idx};    # $system->{sys_idx}->{idx};
-  next unless $sys_idx;
+  # next unless defined $sys_idx;
+  next unless defined $SVS_cnt{$sys_idx};
   my %system = %{$SVS_cnt{$sys_idx}};
   my $satnum = scalar keys %system ;
   printf("idx=%d - num sat=%d \n", $sys_idx, $satnum );
@@ -320,15 +321,23 @@ for my $sysref (@SIG_TABLE_ary) {
     print "\n";
 
     for my $svsig (@sv_sigs) {
-      my %entry = ( %{$$sysref[$svsig] }); ### is this a duplicated hash?? TBD: add data array
+      # array sorted by system / sv / sig -> %entry
+      # - SIG_TABLE data
+      # - SV number
+      my %entry = ( %{$$sysref[$svsig] },
+		sv_nr => $sv_idx ,
+
+         ); ### is this a duplicated hash?? TBD: add data array
       ########### ==========~~~~~~~~~~~~-----------------
       push @svs_sorted, \%entry;
+      push @svs_sig1, \%entry if ( $entry{sig_idx} == 1 );     
     }
   }
-
 }
 
-print Dumper(\@svs_sorted);
+$Data::Dumper::Sortkeys = 1;
+print Data::Dumper->Dump([\@svs_sorted], [qw(\@svs_sorted)] );
+print Data::Dumper->Dump([\@svs_sig1],   [qw(\@svs_sig1)] );
 
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
