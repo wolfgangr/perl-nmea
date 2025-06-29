@@ -294,9 +294,11 @@ my @svs_sig1;    # only main band per system
 
 for my $sysref (@SIG_TABLE_ary) {
   ### TBD next unless ... we have sats in this system ....
-
+  # my %system = %{$SVS_cnt{$sys_idx}};
   my $sys_idx = $$sysref[0]->{sys_idx};    # $system->{sys_idx}->{idx};
-  my $satnum = scalar keys %{$SVS_cnt{$sys_idx}} ;
+  next unless $sys_idx;
+  my %system = %{$SVS_cnt{$sys_idx}};
+  my $satnum = scalar keys %system ;
   printf("idx=%d - num sat=%d \n", $sys_idx, $satnum );
   next unless $satnum ;
 
@@ -305,8 +307,16 @@ for my $sysref (@SIG_TABLE_ary) {
     printf("sys tag=%s - idx=%d || sig tag=%s - idx=%d \n", 
       $sigref->{sys_tag}, $sigref->{sys_idx}, $sigref->{sig_tag}, $sigref->{sig_idx});
     # next if $sigref->{sig_idx} == 0;
+    # for my $sv_ref (sort keys %{$SVS_cnt{$sys_idx}}
 
   }
+
+  for my $sv_idx (sort keys %system) {
+    my @sv_sigs = $system{$sv_idx};
+
+  }
+
+
 }
 
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
