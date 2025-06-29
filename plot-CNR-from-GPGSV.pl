@@ -311,8 +311,11 @@ for my $sysref (@SIG_TABLE_ary) {
 
   }
 
-  for my $sv_idx (sort keys %system) {
-    my @sv_sigs = $system{$sv_idx};
+  for my $sv_idx (sort { $a <=> $b }  keys %system) {
+    my @sv_sigs = sort { $a <=> $b }  keys %{ $system{$sv_idx} };
+    print "sat # ", $sv_idx , "  has data in sig bands: ";
+    print join ' - ', @sv_sigs;
+    print "\n";
 
   }
 
