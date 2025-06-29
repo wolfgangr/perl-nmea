@@ -268,13 +268,7 @@ if(1) {
   }
 }
 
-
-
-exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
-
-
-
-
+#exit; 
 #==============================================================================================
 
 print "====== calling gnuplot =========\n";
@@ -342,7 +336,10 @@ ENDOFCMDANIM
 my $tempdata_sky  = $tempfile_body . '_sky.data';	
 my $temppng_sky  = $tempfile_body . '_sky.png';		
 
+die("DEBUG cutting edge"); #===============================~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~----------------------------
+
 open (SKYDATA, ">".$tempdata_sky) || error ("could not create temp data file $tempdata_sky");
+
 
 
 my @svs; ### TBD syntax dummy .... to be replaced by new structure
