@@ -302,6 +302,7 @@ for my $sysref (@SIG_TABLE_ary) {
   printf("idx=%d - num sat=%d \n", $sys_idx, $satnum );
   next unless $satnum ;
 
+  if (0) {
   for my $sigref (@$sysref) {
     next if $sigref->{sig_idx} == 0;
     printf("sys tag=%s - idx=%d || sig tag=%s - idx=%d \n", 
@@ -309,18 +310,25 @@ for my $sysref (@SIG_TABLE_ary) {
     # next if $sigref->{sig_idx} == 0;
     # for my $sv_ref (sort keys %{$SVS_cnt{$sys_idx}}
 
-  }
+  } }
 
   for my $sv_idx (sort { $a <=> $b }  keys %system) {
     my @sv_sigs = sort { $a <=> $b }  keys %{ $system{$sv_idx} };
+
     print "sat # ", $sv_idx , "  has data in sig bands: ";
     print join ' - ', @sv_sigs;
     print "\n";
 
+    for my $svsig (@sv_sigs) {
+      my %entry = ( %{$$sysref[$svsig] }); ### is this a duplicated hash?? TBD: add data array
+      ########### ==========~~~~~~~~~~~~-----------------
+      push @svs_sorted, \%entry;
+    }
   }
 
-
 }
+
+print Dumper(\@svs_sorted);
 
 exit; # ===~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~---------------------------------------------------
 
