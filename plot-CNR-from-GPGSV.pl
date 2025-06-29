@@ -343,9 +343,12 @@ open (SKYDATA, ">".$tempdata_sky) || error ("could not create temp data file $te
 my @svs; ### TBD syntax dummy .... to be replaced by new structure
 # my @sv_time; ### TBD syntax dummy
 
+my $lt = 0 ; # gnuplot linetype
 foreach my $SVobj (@svs_sorted) {
-	my $SV    = $SVobj->{sv_nr};
+	# my $SV    = $SVobj->{sv_nr};
+	$lt++; # resemble old $SV behaviour by assigning every combination a new line type
         my $SVstr = sprintf("%s_%03d_%s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
+	my $SVhstr = sprintf("%s %03d %s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
 	my @data = @{$SVobj->{data}} ;
 	print Dumper($SVobj);
 	# print Dumper(\@data);
@@ -354,7 +357,7 @@ foreach my $SVobj (@svs_sorted) {
 	my $temppng_sv  = sprintf ("%s_%s.png", $tempfile_body , $SVstr);
 	my $tempdata_sv = sprintf ("%s_%s.data", $tempfile_body , $SVstr);
 
-	printf ("writing data for SV %s with %d data points ... \n", $SVstr, scalar @data );
+	printf ("writing data for SV %s with %d data points ... \n", $SVhstr, scalar @data );
 	exit;
 
 	open (DATAFILE, ">".$tempdata_sv) || error ("could not create temp data file $tempdata_sv");
@@ -384,18 +387,18 @@ foreach my $SVobj (@svs_sorted) {
 
 	print SKYDATA "\n" ;	# does an empty line seperate curves??
 
-	printf ("creating chart for SV# %d....\n", $SV);
+	printf ("creating chart for SV# %d....\n", $SVhstr);
 
 	# create single plot for each SV	 
 	my $command= <<ENDOFCOMMAND;
-# plot for SV # $SV
+# plot for SV # $SVhstr
 set term png
 set output "$temppng_sv"
 set xrange [0:90]
 set yrange [-1:50]
 set xlabel 'Elevation in deg'
 set ylabel 'CNR in dbHz'
-plot "$tempdata_sv" using 2:4 with points lt $SV
+plot "$tempdata_sv" using 2:4 with points lt $lt
 
 ENDOFCOMMAND
 
@@ -403,10 +406,10 @@ ENDOFCOMMAND
 
 
 	# add entry for multi SV scatter plot
-	$command_all .= "plot \"$tempdata_sv\" using 2:4 with points lt $SV\n";
+	$command_all .= "plot \"$tempdata_sv\" using 2:4 with points lt $lt\n";
 
 	# add entry for multi SV animated gif
-	$command_anim .= "plot \"$tempdata_sv\" using 2:4 with points lt $SV\n";
+	$command_anim .= "plot \"$tempdata_sv\" using 2:4 with points lt $lt\n";
 	
 }
 
