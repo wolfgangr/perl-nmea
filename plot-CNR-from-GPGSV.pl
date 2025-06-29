@@ -345,18 +345,16 @@ my @svs; ### TBD syntax dummy .... to be replaced by new structure
 
 foreach my $SVobj (@svs_sorted) {
 	my $SV    = $SVobj->{sv_nr};
+        my $SVstr = sprintf("%s_%03d_%s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
 	my @data = @{$SVobj->{data}} ;
-        # my $hits  = scalar @data ;
-	# if (! ( $hits = $svs[$SV])) { next ; }
-	# print Dumper($SVobj);
-	print Dumper(\@data);
+	print Dumper($SVobj);
+	# print Dumper(\@data);
 	# exit;
-	# my $SV ;
 
-	my $temppng_sv  = sprintf ("%s_%03d.png", $tempfile_body , $SV);
-	my $tempdata_sv = sprintf ("%s_%03d.data", $tempfile_body , $SV);
+	my $temppng_sv  = sprintf ("%s_%s.png", $tempfile_body , $SVstr);
+	my $tempdata_sv = sprintf ("%s_%s.data", $tempfile_body , $SVstr);
 
-	printf ("writing data for SV# %d with %d data points ... \n", $SV, scalar @data );
+	printf ("writing data for SV %s with %d data points ... \n", $SVstr, scalar @data );
 	exit;
 
 	open (DATAFILE, ">".$tempdata_sv) || error ("could not create temp data file $tempdata_sv");
