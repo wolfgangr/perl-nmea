@@ -336,6 +336,7 @@ ENDOFCMDANIM
 my $tempdata_sky  = $tempfile_body . '_sky.data';	
 my $temppng_sky  = $tempfile_body . '_sky.png';		
 
+
 # die("DEBUG cutting edge"); #===============================~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~----------------------------
 
 open (SKYDATA, ">".$tempdata_sky) || error ("could not create temp data file $tempdata_sky");
@@ -376,9 +377,13 @@ foreach my $SVobj (@svs_sorted) {
 			$dp->{snr},
 	 	     );
 		
-		# convert polar data for skyplot
+		# convert data for skyplot
+		# (set polar in gnuplot)
+		# use only data from sig 1 per sys
+		next unless $dp->{sig} == 1;
 		printf 	SKYDATA ("%s %s %s\n",
-			polar2xy(-$dp->{azi}, 90 - $dp->{ele}),
+			# polar2xy(-$dp->{azi}, 90 - $dp->{ele}),
+			$dp->{azi}, $dp->{ele},
                         $dp->{snr}, 
 		);
 	}
