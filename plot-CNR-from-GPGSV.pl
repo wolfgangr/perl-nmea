@@ -420,19 +420,41 @@ ENDOFCOMMAND
 
 close SKYDATA;
 
+#print "rendering skyplot\n";
+#my $command_sky = <<ENDOFCMDSKY;
+## skyplot of SNR vs polar elevation/azimuth
+#set term png
+#set output "$temppng_sky"
+#set size square
+#set view 0 , 270 , 1.5 ,1
+#unset border
+#unset tics
+#set cbtics
+#set cbrange[20:60]
+#set palette defined (20 "blue", 40 "green", 45 "yellow", 55 "red", 60 "#ffaaaa" )
+#splot "$tempdata_sky" u 1:2:3 w p lc palette pt 7
+#ENDOFCMDSKY
+
 print "rendering skyplot\n";
 my $command_sky = <<ENDOFCMDSKY;
 # skyplot of SNR vs polar elevation/azimuth
 set term png
-set output "$temppng_sky"
+set output "$temppng_sky" 
+set polar
 set size square
-set view 0 , 270 , 1.5 ,1
-unset border
-unset tics
-set cbtics
+set angles degrees
+set grid polar 30
+set rrange [90:0]
+set rtics 15 
+set trange [  0 : 360 ] 
+set theta top clockwise 
+set ttics 30 
+set tics front
+unset xtics
+unset ytics
 set cbrange[20:60]
-set palette defined (20 "blue", 40 "green", 45 "yellow", 55 "red", 60 "#ffaaaa" )
-splot "$tempdata_sky" u 1:2:3 w p lc palette pt 7
+set palette defined (20 "blue", 30 "green", 40 "yellow", 50 "red", 60 "magenta" )
+plot "$tempdata_sky" u 1:2:3 w p lc palette pt 7 title "Skyplot for L1 sigs" at 0.5, 0.95 
 ENDOFCMDSKY
 
 gnuplotcmd($command_sky);
