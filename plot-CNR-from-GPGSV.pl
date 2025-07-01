@@ -420,21 +420,6 @@ ENDOFCOMMAND
 
 close SKYDATA;
 
-#print "rendering skyplot\n";
-#my $command_sky = <<ENDOFCMDSKY;
-## skyplot of SNR vs polar elevation/azimuth
-#set term png
-#set output "$temppng_sky"
-#set size square
-#set view 0 , 270 , 1.5 ,1
-#unset border
-#unset tics
-#set cbtics
-#set cbrange[20:60]
-#set palette defined (20 "blue", 40 "green", 45 "yellow", 55 "red", 60 "#ffaaaa" )
-#splot "$tempdata_sky" u 1:2:3 w p lc palette pt 7
-#ENDOFCMDSKY
-
 print "rendering skyplot\n";
 my $command_sky = <<ENDOFCMDSKY;
 # skyplot of SNR vs polar elevation/azimuth
