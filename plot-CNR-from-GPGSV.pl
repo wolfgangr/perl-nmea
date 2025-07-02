@@ -425,14 +425,19 @@ close SKYDATA;
 print "rendering skyplot\n";
 my $command_sky = <<ENDOFCMDSKY;
 # skyplot of SNR vs polar elevation/azimuth
+# CAVE: polar with surface requires capable gnuplot, maybe >= 6.0.3
 set term png
 set output "$temppng_sky" 
 set polar
+unset border
+set border polar
+set polar grid 24, 9 gauss
 set size square
 set angles degrees
 set grid polar 30
-set rrange [90:0]
-set rtics 15 
+set rrange [0 : 90]
+# set rtics 10 
+set rtics ('90' 0 , '60' 30 , '30' 60 , '0' 90)
 set trange [  0 : 360 ] 
 set theta top clockwise 
 set ttics 30 
@@ -441,7 +446,10 @@ unset xtics
 unset ytics
 set cbrange[20:60]
 set palette defined (20 "blue", 30 "green", 40 "yellow", 50 "red", 60 "magenta" )
-plot "$tempdata_sky" u 1:2:3 w p lc palette pt 7 title "Skyplot for L1 sigs" at 0.5, 0.95 
+# plot "$tempdata_sky" u 1:2:3 w p lc palette pt 7 title "Skyplot for L1 sigs" at 0.5, 0.95 
+set multiplot
+plot "$tempdata_sky" using 1:(90-\$2):3 with surface lc palette fillstyle pattern 2 notitle
+plot "$tempdata_sky" using 1:(90-\$2):3 with points lc palette pointtype 7 notitle # title "Skyplot for L1 sigs" at 0.5, 0.95 
 ENDOFCMDSKY
 
 gnuplotcmd($command_sky);
