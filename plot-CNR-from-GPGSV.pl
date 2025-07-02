@@ -269,6 +269,7 @@ if(1) {
 }
 
 #exit; 
+goto COLLECT_STATS ;
 #==============================================================================================
 
 print "====== calling gnuplot =========\n";
@@ -468,31 +469,57 @@ print "rendering animated gif plot\n";
 # render animated gif
 gnuplotcmd($command_anim);
 
-die ("DEBUG after standard plots"); #=========================~~~~~~~~~~~~~~~~~~~~-----------------
+
+COLLECT_STATS:
+
+# die ("DEBUG after standard plots"); #=========================~~~~~~~~~~~~~~~~~~~~-----------------
 my @svs; ### TBD moved dummy
 #=========================================================================0
 print "collecting statistical values\n";
 # we might initialize arrays like
 #	@foo = map {[ (0) x $x ]} 1 .. $y
 
-my @sv_ele_V_cnt = map {[ (0) x 90 ]} (1 .. @svs) ; 
-my @sv_ele_V_sum = map {[ (0) x 90 ]} (1 .. @svs) ;
-my @sv_ele_V_sum2sq = map {[ (0) x 90 ]} (1 .. @svs) ;
+my @sv_ele_V_cnt = map {[ (0) x 91 ]} (1 .. @svs_sorted) ; 
+my @sv_ele_V_sum = map {[ (0) x 91 ]} (1 .. @svs_sorted) ;
+my @sv_ele_V_sum2sq = map {[ (0) x 91 ]} (1 .. @svs_sorted) ;
 
 
 my @data; ### TBD syntax dummy -  to be replaced
 # collect each sv  x elev-1-deg interval
-foreach my $dp(@data) {
-	my $svn = $dp->[1];
-	my $ele = $dp->[2];
-	my $snr = $dp->[4];
+# foreach my $dp(@data) {
+# foreach my $SVobj (@svs_sorted) {
+foreach my $svn (1 .. @svs_sorted) {
+   my $SVobj = $svs_sorted[$svn];
+   next unless defined $SVobj;
+   # copy this from plot data processing
+   # $lt++; # resemble old $SV behaviour by assigning every combination a new line type
+   $lt = $svn; 
+   my $SVstr = sprintf("%s_%03d_%s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
+   my $SVhstr = sprintf("%s %03d %s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
+   my @data = @{$SVobj->{data}} ;
 
-	unless ( $snr > 0 ) {	next ; } 	# exclude 0 and -1 SNR values
+   # my $svn = 
+   foreach my $dp(@data) {
+	# my $svn = $dp->[1];
+	my $ele = $dp->{ele};
+	my $snr = $dp->{snr};
+
+	next unless defined $dp->{timestamp};
+	next unless defined $dp->{ele};
+	next unless defined $dp->{azi};
+	next unless defined $dp->{snr};
+
+	next unless ( $snr > 0 )  ;  	# exclude 0 and -1 SNR values
 	
 	$sv_ele_V_cnt[$svn][$ele] ++ ;		# count occurances
 	$sv_ele_V_sum[$svn][$ele] += $snr ;		# sum
 	$sv_ele_V_sum2sq[$svn][$ele] += $snr * $snr ;	# sum of squares
+   }
 }
+
+
+
+die("DEBUG after binning");
 
 
 my @sv_cnt =();
