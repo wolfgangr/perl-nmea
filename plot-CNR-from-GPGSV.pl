@@ -473,7 +473,7 @@ gnuplotcmd($command_anim);
 COLLECT_STATS:
 
 # die ("DEBUG after standard plots"); #=========================~~~~~~~~~~~~~~~~~~~~-----------------
-my @svs; ### TBD moved dummy
+### my @svs; ### TBD moved dummy
 #=========================================================================0
 print "collecting statistical values\n";
 # we might initialize arrays like
@@ -496,7 +496,7 @@ my $sv_x_ele_sum;
 my $sv_x_ele_sum2sq;
 
 
-my @data; ### TBD syntax dummy -  to be replaced
+### my @data; ### TBD syntax dummy -  to be replaced
 # collect each sv  x elev-1-deg interval
 # foreach my $dp(@data) {
 # foreach my $SVobj (@svs_sorted) {
@@ -582,7 +582,7 @@ my $ele_x_sv_sum2sq;
 # aggregates over elev intervals
 foreach my $ele (0 .. 90 ) {
 	# no obvious skip condition?
-	foreach my $sv(1 .. @svs) {
+	foreach my $sv(1 .. @svs_sorted) {
 		# if (! ($hits = $svs[$sv])) { next ; }
 		unless ( $sv_ele_V_cnt[$sv][$ele] ) { next ; }
 
@@ -671,7 +671,7 @@ my @sv_ele_varc = ();
 my @sv_ele_stdev = ();
 
 
-foreach my $sv(1 .. @svs) {
+foreach my $sv(1 .. @svs_sorted) {
 	unless ($sv_cnt_sum[$sv] > 1) { next ; }
 
 	$sv_mean_snr[$sv] = $sv_sum_sum[$sv] / $sv_cnt_sum[$sv] ;
