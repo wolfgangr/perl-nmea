@@ -508,8 +508,8 @@ foreach my $svn (1 .. @svs_sorted) {
    # copy this from plot data processing
    # $lt++; # resemble old $SV behaviour by assigning every combination a new line type
    $lt = $svn; 
-   my $SVstr = sprintf("%s_%03d_%s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
-   my $SVhstr = sprintf("%s %03d %s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
+   # my $SVstr = sprintf("%s_%03d_%s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
+   # my $SVhstr = sprintf("%s %03d %s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
    my @data = @{$SVobj->{data}} ;
 
    # my $svn = 
@@ -691,8 +691,12 @@ foreach my $sv(1 .. @svs_sorted) {
 	printf ("statiscs for SV ' %3d: mean: %9f; variance: %9f; stddev: %9f",
 		$sv, $sv_mean_snr[$sv], $sv_varc_snr[$sv] , $sv_stdev_snr[$sv]);
 
-	my $temppng_sv_sdev = sprintf ("%s_sdev_%03d.png", $tempfile_body , $sv);
-	my $tempdata_sv_sdev = sprintf ("%s_sdev_%03d.data", $tempfile_body , $sv);
+	my $SVobj = $svs_sorted[$sv];  # retrieve for human readable labeling
+	my $sv_title = sprintf("%s %03d %s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
+	my $sv_mnem  = sprintf("%s_%03d_%s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
+
+	my $temppng_sv_sdev  = sprintf ("%s_sdev_%03d_%s.png",  $tempfile_body , $sv, $sv_mnem);
+	my $tempdata_sv_sdev = sprintf ("%s_sdev_%03d_%s.data", $tempfile_body , $sv, $sv_mnem);
 
 	printf ("   ... writing data ... \n");
 
@@ -714,6 +718,9 @@ foreach my $sv(1 .. @svs_sorted) {
 
 	close SVSDEVDATA;
 
+	# my $SVobj = $svs_sorted[$sv];
+	# my $sv_title = sprintf("%s %03d %s", $SVobj->{sys_tag}, $SVobj->{sv_nr}, $SVobj->{sig_tag});
+
 	my $command_sv_sdev = <<ENDOFCMDSVSDEV;
 # plot standard dev over all satellites per elevation
 set term png
@@ -726,9 +733,9 @@ set xlabel 'Elevation in deg'
 set ylabel 'CNR in dbHz'
 set y2label 'stdev in dbHz'
 set y2tics
-
+set title "$sv_title"
 set multiplot
-plot "$tempdata_sv_sdev" using 1:2 axes x1y1 w lines lw 3 lt $sv
+plot "$tempdata_sv_sdev" using 1:2 axes x1y1 w lines lw 3 lt $sv notitle
 plot "$tempdata_sv_sdev" using 1:2:4 axes x1y1 w yerrorbars lt $sv notitle
 plot "$tempdata_sv_sdev" using 1:4 axes x1y2 w lines lw 1 lt $sv  notitle
 ENDOFCMDSVSDEV
