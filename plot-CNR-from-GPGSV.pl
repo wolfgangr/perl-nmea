@@ -337,7 +337,8 @@ ENDOFCMDANIM
 # polar skyplot color coded
 my $tempdata_sky  = $tempfile_body . '_sky.data';	
 my $temppng_sky  = $tempfile_body . '_sky.png';		
-
+my $temppng_sky1  = $tempfile_body . '_sky1.png';
+my $temppng_sky2  = $tempfile_body . '_sky2.png';
 
 # die("DEBUG cutting edge"); #===============================~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~----------------------------
 
@@ -449,6 +450,11 @@ set palette defined (20 "blue", 30 "green", 40 "yellow", 50 "red", 60 "magenta" 
 # plot "$tempdata_sky" u 1:2:3 w p lc palette pt 7 title "Skyplot for L1 sigs" at 0.5, 0.95 
 set multiplot
 plot "$tempdata_sky" using 1:(90-\$2):3 with surface lc palette fillstyle pattern 2 notitle
+plot "$tempdata_sky" using 1:(90-\$2):3 with points lc palette pointtype 7 notitle # title "Skyplot for L1 sigs" at 0.5, 0.95 
+unset multiplot
+set output "$temppng_sky2"
+plot "$tempdata_sky" using 1:(90-\$2):3 with surface lc palette fillstyle pattern 2 notitle
+set output "$temppng_sky1" 
 plot "$tempdata_sky" using 1:(90-\$2):3 with points lc palette pointtype 7 notitle # title "Skyplot for L1 sigs" at 0.5, 0.95 
 ENDOFCMDSKY
 
