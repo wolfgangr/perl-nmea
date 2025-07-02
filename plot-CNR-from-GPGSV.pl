@@ -273,7 +273,9 @@ if(1) {
 
 print "====== calling gnuplot =========\n";
 
-my $gnuplot = "/usr/bin/gnuplot";
+# my $gnuplot = "/usr/bin/gnuplot";
+my $gnuplot = "/usr/local/bin/gnuplot";
+
 
 #### build temporary folder and file name structure
 # separate path/basename.extension
