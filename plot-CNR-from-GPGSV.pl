@@ -269,7 +269,7 @@ if(1) {
 }
 
 #exit; 
-goto COLLECT_STATS ;
+# goto COLLECT_STATS ;
 #==============================================================================================
 
 print "====== calling gnuplot =========\n";
@@ -310,6 +310,8 @@ my $temppng_all  = $tempfile_body . '_all.png';		# rectangle plot of all sats
 # $temppng_sky  = $tempfile_body . '_sky.png';		# polar skyplot color coded
 # $tempdata_all = $tempfile_body . '_all.data';
 
+goto COLLECT_STATS ;
+#--------------------------------------------------
 # header for all SV on top of each other
 my $command_all = <<ENDOFCMDALL;
 #  all SNR over elev scatter on top of each other
@@ -611,7 +613,7 @@ my $overall_varc_snr = ($ele_x_sv_sum2sq - ($ele_x_sv_sum * $ele_x_sv_sum / $ele
 					($ele_x_sv_cnt-1) ;
 my $overall_stdev_snr = sqrt($overall_varc_snr);
 
-printf ("overall mean: %f; variance: %f;  stddev: %f", 
+printf ("overall mean: %f; variance: %f;  stddev: %f \n", 
 	$overall_mean_snr, $overall_varc_snr, $overall_stdev_snr);
 
 
@@ -630,7 +632,8 @@ my @ele_stdev = ();
 
 
 foreach my $ele (1 .. 90 ) {
-	unless ($ele_cnt_sum[$ele] > 1) { next ; }
+	next unless defined $ele_cnt_sum[$ele];
+	# unless ($ele_cnt_sum[$ele] > 1) { next ; }
 
 	$ele_mean[$ele] = $ele_sum_sum[$ele] / $ele_cnt_sum[$ele] ;
 	$ele_varc[$ele] = ($ele_sum2sq_sum[$ele] - ($ele_sum_sum[$ele] * $ele_sum_sum[$ele]  /
@@ -671,9 +674,11 @@ my @sv_ele_mean = ();
 my @sv_ele_varc = ();
 my @sv_ele_stdev = ();
 
+print "\n";
 
 foreach my $sv(1 .. @svs_sorted) {
-	unless ($sv_cnt_sum[$sv] > 1) { next ; }
+	next unless defined $sv_cnt_sum[$sv];
+	# unless ($sv_cnt_sum[$sv] > 1) { next ; }
 
 	$sv_mean_snr[$sv] = $sv_sum_sum[$sv] / $sv_cnt_sum[$sv] ;
 	$sv_varc_snr[$sv] = ($sv_sum2sq_sum[$sv] - ( $sv_sum_sum[$sv] * $sv_sum_sum[$sv] / 				$sv_cnt_sum[$sv])) /	($sv_cnt_sum[$sv]-1) ;
