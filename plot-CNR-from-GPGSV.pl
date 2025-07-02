@@ -453,7 +453,7 @@ plot "$tempdata_sky" using 1:(90-\$2):3 with surface lc palette fillstyle patter
 plot "$tempdata_sky" using 1:(90-\$2):3 with points lc palette pointtype 7 notitle # title "Skyplot for L1 sigs" at 0.5, 0.95 
 unset multiplot
 set output "$temppng_sky2"
-plot "$tempdata_sky" using 1:(90-\$2):3 with surface lc palette fillstyle pattern 2 notitle
+plot "$tempdata_sky" using 1:(90-\$2):3 with surface lc palette notitle
 set output "$temppng_sky1" 
 plot "$tempdata_sky" using 1:(90-\$2):3 with points lc palette pointtype 7 notitle # title "Skyplot for L1 sigs" at 0.5, 0.95 
 ENDOFCMDSKY
