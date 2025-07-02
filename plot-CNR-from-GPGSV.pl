@@ -484,6 +484,18 @@ my @sv_ele_V_sum = map {[ (0) x 91 ]} (1 .. @svs_sorted) ;
 my @sv_ele_V_sum2sq = map {[ (0) x 91 ]} (1 .. @svs_sorted) ;
 
 
+my @sv_cnt =();
+my @sv_cnt_sum =();
+my @sv_sum_sum =();
+my @sv_sum2sq_sum =();
+
+my $svs_cnt;
+my $sv_x_ele_cls;
+my $sv_x_ele_cnt;
+my $sv_x_ele_sum;
+my $sv_x_ele_sum2sq;
+
+
 my @data; ### TBD syntax dummy -  to be replaced
 # collect each sv  x elev-1-deg interval
 # foreach my $dp(@data) {
@@ -515,27 +527,28 @@ foreach my $svn (1 .. @svs_sorted) {
 	$sv_ele_V_sum[$svn][$ele] += $snr ;		# sum
 	$sv_ele_V_sum2sq[$svn][$ele] += $snr * $snr ;	# sum of squares
    }
-}
+#  }
+
+   # die("DEBUG after binning");
 
 
-
-die("DEBUG after binning");
-
-
-my @sv_cnt =();
-my @sv_cnt_sum =();
-my @sv_sum_sum =();
-my @sv_sum2sq_sum =();
-
-my $svs_cnt;
-my $sv_x_ele_cls;
-my $sv_x_ele_cnt;
-my $sv_x_ele_sum;
-my $sv_x_ele_sum2sq;
+#my @sv_cnt =();
+#my @sv_cnt_sum =();
+#my @sv_sum_sum =();
+#my @sv_sum2sq_sum =();
+#
+#my $svs_cnt;
+#my $sv_x_ele_cls;
+#my $sv_x_ele_cnt;
+#my $sv_x_ele_sum;
+#my $sv_x_ele_sum2sq;
 
 # aggregates over satellites
-foreach my $sv(1 .. @svs) {
-	unless ((my $hits = $svs[$sv])) { next ; }
+   # think we do not need a 2nd run?
+   #### foreach my $sv(1 .. @svs) {
+	# unless ((my $hits = $svs[$sv])) { next ; }
+
+	my $sv = $svn;  # we merged the loops
 	foreach my $ele (0 .. 90 ) {
 		unless ( $sv_ele_V_cnt[$sv][$ele] ) { next ; }
 		$sv_cnt[$sv] ++;	# number of elev intervals in track
@@ -543,6 +556,7 @@ foreach my $sv(1 .. @svs) {
 		$sv_sum_sum[$sv] += $sv_ele_V_sum[$sv][$ele];
 		$sv_sum2sq_sum[$sv] += $sv_ele_V_sum2sq[$sv][$ele];
 	}
+	next unless $sv_cnt[$sv] ; # skip empty track corpses
 	$svs_cnt ++ ;		# number of SVs with data
 	$sv_x_ele_cls += $sv_cnt[$sv];	# number of classes
 	$sv_x_ele_cnt += $sv_cnt_sum[$sv];  # number of datapoints
@@ -550,6 +564,8 @@ foreach my $sv(1 .. @svs) {
 	$sv_x_ele_sum2sq += $sv_sum2sq_sum[$sv];
 }
 
+
+die("da bin ich aber jetzt schon neugierig...");
 
 my @ele_cnt =();
 my @ele_cnt_sum =();
