@@ -565,7 +565,7 @@ foreach my $svn (1 .. @svs_sorted) {
 }
 
 
-die("da bin ich aber jetzt schon neugierig...");
+# die("da bin ich aber jetzt schon neugierig...");
 
 my @ele_cnt =();
 my @ele_cnt_sum =();
@@ -591,6 +591,7 @@ foreach my $ele (0 .. 90 ) {
 		$ele_sum_sum[$ele] += $sv_ele_V_sum[$sv][$ele];
 		$ele_sum2sq_sum[$ele] += $sv_ele_V_sum2sq[$sv][$ele];
 	}
+	next unless $ele_cnt[$ele];
 	$elevs_cnt ++ ;		# number of elevs with data
 	$ele_x_sv_cls += $ele_cnt[$ele];  # number of classes
 	$ele_x_sv_cnt += $ele_cnt_sum[$ele]; # number of datapoints
