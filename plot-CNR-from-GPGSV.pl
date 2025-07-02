@@ -652,12 +652,16 @@ my $command_sdev = <<ENDOFCMDSDEV;
 set term png
 set output "$temppng_sdev"
 set xrange [0:90]
-set yrange [0:50]
+set yrange [0:55]
+set y2range [0:11]
 set xlabel 'Elevation in deg'
 set ylabel 'CNR in dbHz'
+set y2label 'stdev in dbHz'
+set y2tics
 set multiplot
-plot "$tempdata_sdev" using 1:2 w lines lw 3
-plot "$tempdata_sdev" using 1:2:4 w yerrorbars
+plot "$tempdata_sdev" using 1:2 axes x1y1  w lines lw 3
+plot "$tempdata_sdev" using 1:2:4 axes x1y1 w yerrorbars notitle
+plot "$tempdata_sdev" using 1:4 axes x1y2 w lines lw 1 notitle
 
 ENDOFCMDSDEV
 
@@ -715,12 +719,18 @@ foreach my $sv(1 .. @svs_sorted) {
 set term png
 set output "$temppng_sv_sdev"
 set xrange [0:90]
-set yrange [0:50]
+set yrange [0:55]
+# set x2range [0:90]
+set y2range [0:11]
 set xlabel 'Elevation in deg'
 set ylabel 'CNR in dbHz'
+set y2label 'stdev in dbHz'
+set y2tics
+
 set multiplot
-plot "$tempdata_sv_sdev" using 1:2 w lines lw 3 lt $sv
-plot "$tempdata_sv_sdev" using 1:2:4 w yerrorbars lt $sv
+plot "$tempdata_sv_sdev" using 1:2 axes x1y1 w lines lw 3 lt $sv
+plot "$tempdata_sv_sdev" using 1:2:4 axes x1y1 w yerrorbars lt $sv notitle
+plot "$tempdata_sv_sdev" using 1:4 axes x1y2 w lines lw 1 lt $sv  notitle
 ENDOFCMDSVSDEV
 
 	gnuplotcmd($command_sv_sdev);
