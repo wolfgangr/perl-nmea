@@ -25,9 +25,9 @@ GetOptions (  \%options, "config|c=s@",  "help|h|?",
 
                 ) or usage ();
 
-$options{table}='default' unless (
-	$options{table} | $options{array} |
-	$options{systems} | $options{sigids} | $options{freqs}
+$options{table}='default' unless ( (  scalar %options) && 
+	$options{table} || $options{array} ||
+	$options{systems} || $options{sigids} || $options{freqs}
 );
 
 print STDERR Dumper(\%options);
@@ -37,7 +37,7 @@ if ($options{help}) {
         usage ();
 }
 
-die("DEBUG option processing"); # ===========================================~~~~~~~~~~--------------
+# die("DEBUG option processing"); #
 
 # ==== import GNSS systems specs ===========================
 
@@ -54,7 +54,7 @@ our @SIG_TABLE_ary;
 $Data::Dumper::Sortkeys = 1;
 # print Data::Dumper->Dump([\@svs_sorted], [qw(\@svs_sorted)] );
 
-
+# if ($options{help}) {
 # print Dumper (\%SIG_TABLE);
 # print Dumper (\@SIG_TABLE_ary);
 # exit;
