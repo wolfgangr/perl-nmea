@@ -48,6 +48,9 @@ if ($options{config}) {
 
 # ==== import GNSS systems specs ===========================
 # my $config = $options{config} // "./GNSS_def.pl";
+# my $config =  "./GNSS_def.pl";
+# $config = $options{config} if defined $config = $options{config} ;
+# eval `cat  $config`;
 # require  $config;
 require "./GNSS_def.pl";
 # eval $config;
