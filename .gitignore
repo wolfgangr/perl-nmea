@@ -7,3 +7,6 @@ plot-CNR-from-GPGSV.pl.00?
 *.swp
 voxels
 ntrips
+GGA*
+*.gnu
+*.data
