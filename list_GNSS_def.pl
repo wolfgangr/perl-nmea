@@ -63,15 +63,33 @@ our @SIG_TABLE_ary;
 $Data::Dumper::Sortkeys = 1;
 # print Data::Dumper->Dump([\@svs_sorted], [qw(\@svs_sorted)] );
 
-# if ($options{help}) {
 # print Dumper (\%SIG_TABLE);
+if ($options{table}) {
+	print Data::Dumper->Dump([\%SIG_TABLE], [qw(\%SIG_TABLE)] )
+}
+
 # print Dumper (\@SIG_TABLE_ary);
-# exit;
-# print Dumper (\%systems);
+if ($options{array}) {
+        print Data::Dumper->Dump([\@SIG_TABLE_ary], [qw(\@SIG_TABLE_ary)] )
+}
+
+# print Dumper (\systems);
+if ($options{systems}) {
+        print Data::Dumper->Dump([\%systems], [qw(\%systems)] )
+}
+
 # print Dumper (\@sigids);
+if ($options{sigids}) {
+        print Data::Dumper->Dump([\@sigids], [qw(\@sigids)] )
+}
+
 # print Dumper (\@sig_freqs);
+if ($options{freqs}) {
+        print Data::Dumper->Dump([\@sig_freqs], [qw(\@sig_freqs)] )
+}
 
-
+print STDERR "DONE\n";
+exit;
 # ==== SUBS  =======
 
 sub usage {

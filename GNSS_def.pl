@@ -12,7 +12,7 @@ Readonly our %systems => map { $systems_ltr[$_] => {
   }    } (0 .. $#systems_ltr);
 
 # Table 7-34 GNSS ID
-Readonly my @sigids => ( [],
+Readonly our @sigids => ( [],
         [ qw(all L1_CA L1_PY L1_M L2_PY L2C-M L2C-L L5-I L5-Q) ],
         [ qw(all G1_CA G1_P       G2_CA G2_P) ],
         [ qw(all E5a E5b E5ab E6A E6BC L1A L1BC ) ],
