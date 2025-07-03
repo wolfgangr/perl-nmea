@@ -25,7 +25,9 @@ GetOptions (  \%options, "config|c=s@",  "help|h|?",
 
                 ) or usage ();
 
-$options{table}='default' unless ( (  scalar %options) && 
+$options{table}='default' unless ( 
+	# (  ! scalar %options) || 
+	(  scalar %options) && 
 	$options{table} || $options{array} ||
 	$options{systems} || $options{sigids} || $options{freqs}
 );
@@ -37,11 +39,18 @@ if ($options{help}) {
         usage ();
 }
 
+if ($options{config}) {
+        die "--config not yet implemented";
+}
+
+
 # die("DEBUG option processing"); #
 
 # ==== import GNSS systems specs ===========================
-
+# my $config = $options{config} // "./GNSS_def.pl";
+# require  $config;
 require "./GNSS_def.pl";
+# eval $config;
 our %systems;
 our @sigids;
 our @sig_freqs;
@@ -77,6 +86,7 @@ Usage:
 	show this message
 
   -c|--config <path to GNSS system config file> 
+	### TBD
 	Default: ./GNSS_def.pl
 
 output options (may be combined)
