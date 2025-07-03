@@ -17,7 +17,9 @@
 use warnings;
 use strict;
 
-use Time::Local 'timegm_nocheck' ;	# tiny but what I need
+# use Time::Local 'timegm_nocheck' ;	# tiny but what I need
+
+use Getopt::Long;
 use Data::Dumper ;
 # use Math::Interpolate qw(linear_interpolate robust_interpolate);
 # use Math::Spline;
@@ -25,11 +27,30 @@ use Data::Dumper ;
 use Devel::Size qw(size total_size);
 # use Readonly;
 
+
+# ==== option processing ===================
+
+my %options =();
+GetOptions (  \%options, "config|c=s@", "context|x=s", "limit|l=i" , "help|h|?", 
+	"action|a=s", "yes|y", "dir|d=s", "prefix|p=s", "dtf|f=s"
+		) or usage ();
+
+print Dumper(\%options);
+# exit; # ===========================================
+
+if ($options{help}) {
+        usage ();
+}
+
+die("DEBUG option processing"); # ===========================================~~~~~~~~~~--------------
+
+# ==== import GNSS systems specs ===========================
+
 require "./GNSS_def.pl";
 our %systems;
 our @SIG_TABLE_ary;
 
-# read input file name from cmd line ==================================================================
+# ==== read input file name from cmd line ==================================================================
 
 my %SVS_cnt = ();   # keep SV sys and sig IDs
 my %time_dat =();   # new data structure
@@ -213,3 +234,36 @@ printf "\@svs_sig1   has %d entries\n"  , scalar @svs_sig1;
 
 }
 
+# ======================================================
+# ==== SUBS  =======
+
+sub usage {
+        print  <<EOU;
+
+Do foo bar tralala
+
+Usage:
+
+  -h|--help
+	show this message
+
+  -c|--config <path to config file> [ -c <another path> ... ]
+	Default: /usr/local/etc/backup_cleaner.conf
+	see there for template
+
+
+  -l|--limit <max includes>
+        include limit to protect against endless loops
+
+  -d|--dir <directory>
+	directory in which the snapshots to be cleared out reside.
+	May or may not be a btrfs subvolume by itself.
+
+  -p|--prefix <prefix>
+	the prefix is prepended to the datetime to form a snapshots file name.
+	Defaults to ''.
+
+
+EOU
+        exit (0);
+} # - end of sub usage -
