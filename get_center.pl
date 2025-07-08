@@ -31,6 +31,7 @@ my %qselect = (
 # reference points 0.05 deg = 3 min ~  
 my $lat_0 = 49.95;
 my $lon_0 = 12.25;
+my $alt_0 = 554.4;
 
 my $mm_per_deg = 40e9 / 360 ; # earth circumference at equator
 # ====================
@@ -67,19 +68,19 @@ while (<>) {
    chomp ; chop ;
    if( /^\$G([NPLBAQ])(GGA),(.*)(\*..)$/  ) { # process only GGA lines
       my @fields = split (',' , $3);
-      print "\n$_\n";
-      print scalar @fields ;
+      # print "\n$_\n";
+      # print scalar @fields ;
       # unicore ref manual, testest with UM98X and quectel LC29H
       # parse time like hhmmss.ssi 194832.000, millisecs may vary
       my($hh, $mm, $ss) = (  $fields[0] =~ /^(\d{2})(\d{2})(\d{2}\.?\d{,4})$/ );
-      printf("time string: %s -> hr: %d, min: %d, sec: %s | ", $fields[0], $hh, $mm, $ss);
+      # printf("time string: %s -> hr: %d, min: %d, sec: %s | ", $fields[0], $hh, $mm, $ss);
 
       # parse lat / lon ddmm.mmmmmmmm
       my($lat_deg, $lat_dmin) = ( $fields[1] =~ /^(\d{2,})(\d{2}\.\d+)$/ );
-      printf("lat: %s -> deg:%d, min: %s | ", $fields[1], $lat_deg, $lat_dmin );
+      # printf("lat: %s -> deg:%d, min: %s | ", $fields[1], $lat_deg, $lat_dmin );
       # TBD: process South and West - no test data
       my($lon_deg, $lon_dmin) = ( $fields[3] =~ /^(\d{2,})(\d{2}\.\d+)$/ );
-      printf("lon: %s -> deg:%d, min: %s | ", $fields[1], $lon_deg, $lon_dmin );
+      # printf("lon: %s -> deg:%d, min: %s | ", $fields[1], $lon_deg, $lon_dmin );
 
       my $qual = $fields[5];
       unless (defined $qselect{$qual}) {
@@ -88,7 +89,7 @@ while (<>) {
       }
       # my $sats = $fields[6];
       # my $hdop = $fields[7];
-      my $alt  = $fields[8];
+      my $alt  = $fields[8] - $alt_0 ;
       # my $age  = $fields[13];
       # print "\n\t";
       # printf("q: %1s sv: %d hdop: %s alt: %s age: %s | ", 
@@ -121,10 +122,10 @@ while (<>) {
       $alt_min = min ($alt_min, $alt);
       $alt_max = max ($alt_max, $alt);
 
-      print "\n";
+      # print "\n";
    } else { # other line than $G*GGA
         $skip_cnt++;
-	print '.';
+	# print '.';
    }
 	
 }
@@ -138,16 +139,37 @@ print "\n";
 printf ("lat - cnt: %d  - sum: %f - sum of squares: %e \n", $lat_cnt, $lat_sum, $lat_2sum); 
 my $lat_avg = $lat_0 + $lat_sum / $lat_cnt;
 my $lat_stddev = sqrt(($lat_2sum / $lat_cnt) - ($lat_sum * $lat_sum)/($lat_cnt * $lat_cnt));
-printf ("\tmin: %.10f - max: %.10f - diff: %.10f\n", $lat_min + $lat_0, $lat_max+ $lat_0, $lat_max - $lat_min);
-printf ("\taverage: %.10f - stddev: %.10f \n", $lat_avg , $lat_stddev);
-printf ("diff = %.1f mm; stdev = %.1f mm\n", 
+printf ("\tmin: %.11f - max: %.11f - diff: %.11f\n", 
+	$lat_min + $lat_0, $lat_max+ $lat_0, $lat_max - $lat_min);
+printf ("\taverage: %.11f - stddev: %.11f \n", $lat_avg , $lat_stddev);
+printf ("\tdiff = %.1f mm; stdev = %.1f mm\n", 
 	($lat_max - $lat_min)* $mm_per_deg, 
 	$lat_stddev * $mm_per_deg);
 
+my $cos_lat = cos($lat_avg * 3.14159 / 180);
+
 print "\n";
 printf ("lon - cnt: %d  - sum: %f -isum of squares: %e \n", $lon_cnt, $lon_sum, $lon_2sum);
-printf ("\tmin: %.10f - max: %.10f \n", $lon_min, $lon_max);
+my $lon_avg = $lon_0 + $lon_sum / $lon_cnt;
+my $lon_stddev = sqrt(($lon_2sum / $lon_cnt) - ($lon_sum * $lon_sum)/($lon_cnt * $lon_cnt));
+printf ("\tmin: %.11f - max: %.11f - diff: %.11f \n", 
+	$lon_min + $lon_0, $lon_max + $lon_0, $lon_max - $lon_min);
+printf ("\taverage: %.11f - stddev: %.11f \n", $lon_avg , $lon_stddev);
+printf ("\tdiff = %.1f mm; stdev = %.1f mm\n",
+        ($lon_max - $lon_min) * $mm_per_deg * $cos_lat,
+        $lon_stddev * $mm_per_deg * $cos_lat);
+
+
 
 print "\n";
 printf ("alt - cnt: %d  - sum: %f - sum of squares: %e \n", $alt_cnt, $alt_sum, $alt_2sum);
+my $lat_avg = $lat_0 + $lat_sum / $lat_cnt;
+my $lat_stddev = sqrt(($lat_2sum / $lat_cnt) - ($lat_sum * $lat_sum)/($lat_cnt * $lat_cnt));
 printf ("\tmin: %.4f - max: %.4f \n", $alt_min, $alt_max);
+printf ("\taverage: %.11f - stddev: %.11f \n", $lat_avg , $lat_stddev);
+printf ("\tdiff = %.1f mm; stdev = %.1f mm\n",
+        ($lat_max - $lat_min)* $mm_per_deg ,
+        $lat_stddev * $mm_per_deg);
+
+
+
