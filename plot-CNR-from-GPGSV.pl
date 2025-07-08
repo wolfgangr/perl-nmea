@@ -310,7 +310,7 @@ my $temppng_all  = $tempfile_body . '_all.png';		# rectangle plot of all sats
 # $temppng_sky  = $tempfile_body . '_sky.png';		# polar skyplot color coded
 # $tempdata_all = $tempfile_body . '_all.data';
 
-goto COLLECT_STATS ;
+# goto COLLECT_STATS ;
 #--------------------------------------------------
 # header for all SV on top of each other
 my $command_all = <<ENDOFCMDALL;
