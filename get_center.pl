@@ -93,8 +93,8 @@ while (<>) {
       # printf("q: %1s sv: %d hdop: %s alt: %s age: %s | ", 
       #       $qual,  $sats, $hdop,   $alt , $age);
             
-      my $lat = $lat_deg + $lat_dmin/60;
-      my $lon = $lon_deg + $lon_dmin/60;
+      my $lat = $lat_deg + $lat_dmin/60 - $lat_0;
+      my $lon = $lon_deg + $lon_dmin/60 - $lon_0;
 
       unless (defined $lat && defined $lon && defined $alt) {
          $err_cnt++;
@@ -135,10 +135,10 @@ printf ("skipped: %d - qual miss: %d - format errors: %d\n", $skip_cnt, $noq_cnt
 
 print "\n";
 printf ("lat - cnt: %d  - sum: %f - sum of squares: %e \n", $lat_cnt, $lat_sum, $lat_2sum); 
-my $lat_avg = $lat_sum / $lat_cnt;
-my $lat_stddev = (($lat_2sum / $lat_cnt) - ($lat_avg * $lat_avg));
-printf ("\tmin: %.10f - max: %.10f - diff: %.10f\n", $lat_min, $lat_max, $lat_max - $lat_min);
-printf ("\taverage: %.10f - stddev: %.15f \n", $lat_avg , $lat_stddev);
+my $lat_avg = $lat_0 + $lat_sum / $lat_cnt;
+my $lat_stddev = sqrt(($lat_2sum / $lat_cnt) - ($lat_sum * $lat_sum)/($lat_cnt * $lat_cnt));
+printf ("\tmin: %.10f - max: %.10f - diff: %.10f\n", $lat_min + $lat_0, $lat_max+ $lat_0, $lat_max - $lat_min);
+printf ("\taverage: %.10f - stddev: %.10f \n", $lat_avg , $lat_stddev);
 
 print "\n";
 printf ("lon - cnt: %d  - sum: %f -isum of squares: %e \n", $lon_cnt, $lon_sum, $lon_2sum);
