@@ -104,19 +104,19 @@ while (<>) {
       # everything fine - collect aggregates
       $lat_cnt++;
       $lat_sum  += $lat;
-      $lat_2sum += $lat * $lat;
+      $lat_2sum += ($lat * $lat);
       $lat_min = min ($lat_min, $lat);
       $lat_max = max ($lat_max, $lat);
 
       $lon_cnt++;
       $lon_sum  += $lon;
-      $lon_2sum += $lon * $lon;
+      $lon_2sum += ($lon * $lon);
       $lon_min = min ($lon_min, $lon);
       $lon_max = max ($lon_max, $lon);
 
       $alt_cnt++;
       $alt_sum  += $alt;
-      $alt_2sum += $alt * $alt;
+      $alt_2sum += ($alt * $alt);
       $alt_min = min ($alt_min, $alt);
       $alt_max = max ($alt_max, $alt);
 
@@ -135,8 +135,15 @@ printf ("skipped: %d - qual miss: %d - format errors: %d\n", $skip_cnt, $noq_cnt
 
 print "\n";
 printf ("lat - cnt: %d  - sum: %f - sum of squares: %e \n", $lat_cnt, $lat_sum, $lat_2sum); 
-printf ("\tmin: %.10f - max: %.10f \n", $lat_min, $lat_max);
+my $lat_avg = $lat_sum / $lat_cnt;
+my $lat_stddev = (($lat_2sum / $lat_cnt) - ($lat_avg * $lat_avg));
+printf ("\tmin: %.10f - max: %.10f - diff: %.10f\n", $lat_min, $lat_max, $lat_max - $lat_min);
+printf ("\taverage: %.10f - stddev: %.15f \n", $lat_avg , $lat_stddev);
+
+print "\n";
 printf ("lon - cnt: %d  - sum: %f -isum of squares: %e \n", $lon_cnt, $lon_sum, $lon_2sum);
 printf ("\tmin: %.10f - max: %.10f \n", $lon_min, $lon_max);
+
+print "\n";
 printf ("alt - cnt: %d  - sum: %f - sum of squares: %e \n", $alt_cnt, $alt_sum, $alt_2sum);
 printf ("\tmin: %.4f - max: %.4f \n", $alt_min, $alt_max);
