@@ -159,17 +159,12 @@ printf ("\tdiff = %.1f mm; stdev = %.1f mm\n",
         ($lon_max - $lon_min) * $mm_per_deg * $cos_lat,
         $lon_stddev * $mm_per_deg * $cos_lat);
 
-
-
 print "\n";
 printf ("alt - cnt: %d  - sum: %f - sum of squares: %e \n", $alt_cnt, $alt_sum, $alt_2sum);
-my $lat_avg = $lat_0 + $lat_sum / $lat_cnt;
-my $lat_stddev = sqrt(($lat_2sum / $lat_cnt) - ($lat_sum * $lat_sum)/($lat_cnt * $lat_cnt));
-printf ("\tmin: %.4f - max: %.4f \n", $alt_min, $alt_max);
-printf ("\taverage: %.11f - stddev: %.11f \n", $lat_avg , $lat_stddev);
-printf ("\tdiff = %.1f mm; stdev = %.1f mm\n",
-        ($lat_max - $lat_min)* $mm_per_deg ,
-        $lat_stddev * $mm_per_deg);
-
-
-
+my $alt_avg = $alt_0 + $alt_sum / $alt_cnt;
+my $alt_stddev = sqrt(($alt_2sum / $alt_cnt) - ($alt_sum * $alt_sum)/($alt_cnt * $alt_cnt));
+printf ("\tmin: %.4f - max: %.4f - - diff: %.4f \n", 
+        $alt_min + $alt_0, $alt_max + $alt_0, $alt_max - $alt_min);
+printf ("\taverage: %.4f - stddev: %.4f \n", $alt_avg , $alt_stddev);
+printf ("\tdiff = %.1f mm; stdev = %.1f mm\n", 
+	($alt_max - $alt_min ) * 1000,	$alt_stddev * 1000 );
