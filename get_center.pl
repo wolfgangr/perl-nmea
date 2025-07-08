@@ -32,7 +32,7 @@ my %qselect = (
 my $lat_0 = 49.95;
 my $lon_0 = 12.25;
 
-my $m_per_deg = 40e6 / 360 ; # earth circumference at equator
+my $m_per_deg = 40e9 / 360 ; # earth circumference at equator
 # ====================
 # read from file in @ARGV
 
@@ -140,7 +140,7 @@ my $lat_avg = $lat_0 + $lat_sum / $lat_cnt;
 my $lat_stddev = sqrt(($lat_2sum / $lat_cnt) - ($lat_sum * $lat_sum)/($lat_cnt * $lat_cnt));
 printf ("\tmin: %.10f - max: %.10f - diff: %.10f\n", $lat_min + $lat_0, $lat_max+ $lat_0, $lat_max - $lat_min);
 printf ("\taverage: %.10f - stddev: %.10f \n", $lat_avg , $lat_stddev);
-printf ("diff = %.4f m; stdev diff = %.4f m\n", 
+printf ("diff = %.1f mm; stdev diff = %.1f mm\n", 
 	($lat_max - $lat_min)* $m_per_deg, 
 	$lat_stddev * $m_per_deg);
 
