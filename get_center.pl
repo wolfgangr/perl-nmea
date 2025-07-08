@@ -17,9 +17,9 @@ while (<>) {
    chomp ; chop ;
    if( /^\$G([NPLBAQ])(GGA),(.*)(\*..)$/  ) { # process only GGA lines
       my @fields = split (',' , $3);
-      print "\n";
+      print "\n$_\n";
       print scalar @fields ;
-
+      # unicore ref manual, testest with UM98X and quectel LC29H
       # parse time like hhmmss.ssi 194832.000, millisecs may vary
       my($hh, $mm, $ss) = (  $fields[0] =~ /^(\d{2})(\d{2})(\d{2}\.?\d{,4})$/ );
       printf("time string: %s -> hr: %d, min: %d, sec: %s | ", $fields[0], $hh, $mm, $ss);
@@ -31,7 +31,14 @@ while (<>) {
       my($lon_deg, $lon_min) = ( $fields[3] =~ /^(\d{2,})(\d{2}\.\d+)$/ );
       printf("lon: %s -> deg:%d, min: %s | ", $fields[1], $lon_deg, $lon_min );
 
-
+      my $qual = $fields[5];
+      my $sats = $fields[6];
+      my $hdop = $fields[7];
+      my $alt  = $fields[8];
+      my $age  = $fields[13];
+      printf("q: %1s sv: %d hdop: %s alt: %s age: %s | ", 
+             $qual,  $sats, $hdop,   $alt , $age);
+            
 
       print "\n";
    } else { # other line than $G*GGA
