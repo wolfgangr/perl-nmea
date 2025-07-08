@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # read NMEA data,
-# quick hack to find base station antenna coordinate
+# crude hack to find base station antenna coordinate
 # record som hrs of RTK fix supported by other caster
 # grep GGA to speed operation
 # load that file with this script
@@ -32,7 +32,7 @@ my %qselect = (
 my $lat_0 = 49.95;
 my $lon_0 = 12.25;
 
-my $m_per_deg = 40e9 / 360 ; # earth circumference at equator
+my $mm_per_deg = 40e9 / 360 ; # earth circumference at equator
 # ====================
 # read from file in @ARGV
 
@@ -140,9 +140,9 @@ my $lat_avg = $lat_0 + $lat_sum / $lat_cnt;
 my $lat_stddev = sqrt(($lat_2sum / $lat_cnt) - ($lat_sum * $lat_sum)/($lat_cnt * $lat_cnt));
 printf ("\tmin: %.10f - max: %.10f - diff: %.10f\n", $lat_min + $lat_0, $lat_max+ $lat_0, $lat_max - $lat_min);
 printf ("\taverage: %.10f - stddev: %.10f \n", $lat_avg , $lat_stddev);
-printf ("diff = %.1f mm; stdev diff = %.1f mm\n", 
-	($lat_max - $lat_min)* $m_per_deg, 
-	$lat_stddev * $m_per_deg);
+printf ("diff = %.1f mm; stdev = %.1f mm\n", 
+	($lat_max - $lat_min)* $mm_per_deg, 
+	$lat_stddev * $mm_per_deg);
 
 print "\n";
 printf ("lon - cnt: %d  - sum: %f -isum of squares: %e \n", $lon_cnt, $lon_sum, $lon_2sum);
