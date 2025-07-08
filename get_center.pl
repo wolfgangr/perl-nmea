@@ -26,10 +26,30 @@ my %qselect = (
 	# 7 => 'manual',
 	# 8 => 'simulator',
       );
-
+# reference points 0.05 deg = 3 min ~  
+my $lat_0 = 49.95;
+my $lon_0 = 12.25;
 
 # ====================
 # read from file in @ARGV
+
+# aggregator vars
+my $lat_cnt  = 0;
+my $lat_sum  = 0;
+my $lat_2sum = 0;
+
+my $lon_cnt  = 0;
+my $lon_sum  = 0;
+my $lon_2sum = 0;
+
+my $alt_cnt  = 0;
+my $alt_sum  = 0;
+my $alt_2sum = 0;
+
+my $skip_cnt = 0; # lines not matching G*GGA
+my $noq_cnt  = 0; # lines matching G*GGA but not quality pattern
+my$err_cnt  = 0; # lines matching G*GGA but not being parsable
+
 while (<>) {
    chomp ; chop ;
    if( /^\$G([NPLBAQ])(GGA),(.*)(\*..)$/  ) { # process only GGA lines
@@ -49,23 +69,50 @@ while (<>) {
       printf("lon: %s -> deg:%d, min: %s | ", $fields[1], $lon_deg, $lon_min );
 
       my $qual = $fields[5];
-      next unless defined $qselect{$qual};
-      my $sats = $fields[6];
-      my $hdop = $fields[7];
+      unless (defined $qselect{$qual}) {
+         $noq_cnt++;
+         next;
+      }
+      # my $sats = $fields[6];
+      # my $hdop = $fields[7];
       my $alt  = $fields[8];
-      my $age  = $fields[13];
-      printf("q: %1s sv: %d hdop: %s alt: %s age: %s | ", 
-             $qual,  $sats, $hdop,   $alt , $age);
+      # my $age  = $fields[13];
+      # print "\n\t";
+      # printf("q: %1s sv: %d hdop: %s alt: %s age: %s | ", 
+      #       $qual,  $sats, $hdop,   $alt , $age);
             
+      my $lat = $lat_deg + $lat_min/60;
+      my $lon = $lon_deg + $lon_min/60;
+
+      unless (defined $lat && defined $lon && defined $alt) {
+         $err_cnt++;
+         next;
+      }
+   
+      # everything fine - collect aggregates
+      $lat_cnt++;
+      $lat_sum  += $lat;
+      $lat_2sum += $lat * $lat;
+
+      $lon_cnt++;
+      $lon_sum  += $lon;
+      $lon_2sum += $lon * $lon;
+
+      $alt_cnt++;
+      $alt_sum  += $alt;
+      $alt_2sum += $alt * $alt;
 
       print "\n";
    } else { # other line than $G*GGA
+        $skip_cnt++;
 	print '.';
    }
 	
 }
 
+
+
 print "\n";
-
-
-
+printf ("lat - cnt: %d  - sum: %f - sum of squares: %e \n", $lat_cnt, $lat_sum, $lat_2sum); 
+printf ("lon - cnt: %d  - sum: %f - sum of squares: %e \n", $lon_cnt, $lon_sum, $lon_2sum);
+printf ("alt - cnt: %d  - sum: %f - sum of squares: %e \n", $alt_cnt, $alt_sum, $alt_2sum);
