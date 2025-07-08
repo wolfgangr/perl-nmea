@@ -36,6 +36,8 @@ my $lon_0 = 12.25;
 # read from file in @ARGV
 
 # aggregator vars
+my $line_cnt=0;
+
 my $lat_cnt  = 0;
 my $lat_sum  = 0;
 my $lat_2sum = 0;
@@ -60,6 +62,7 @@ my $noq_cnt  = 0; # lines matching G*GGA but not quality pattern
 my $err_cnt  = 0; # lines matching G*GGA but not being parsable
 
 while (<>) {
+   $line_cnt++;
    chomp ; chop ;
    if( /^\$G([NPLBAQ])(GGA),(.*)(\*..)$/  ) { # process only GGA lines
       my @fields = split (',' , $3);
@@ -125,7 +128,10 @@ while (<>) {
 	
 }
 
-
+print "\n\n------------------------------------------------------------\n";
+printf ("total lines processed: %d\n", $line_cnt);
+printf ("lat cnt: %d - lon cnt:   %d - alt cnt:       %D\n", $lat_cnt, $lon_cnt, $alt_cnt);
+printf ("skipped: %d - qual miss: %d - format errors: %d\n", $skip_cnt, $noq_cnt, $err_cnt);
 
 print "\n";
 printf ("lat - cnt: %d  - sum: %f - sum of squares: %e \n", $lat_cnt, $lat_sum, $lat_2sum); 
